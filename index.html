@@ -265,6 +265,25 @@ function genId() {
 
 function nowTs() { return Date.now(); }
 
+/** Logged time in Hong Kong, e.g. 27/10 14:05. Falls back to updatedAt for older rows. */
+function formatLoggedAt(ts) {
+    const n = typeof ts === 'number' && isFinite(ts) ? ts : NaN;
+    if (!isFinite(n)) return '';
+    const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Hong_Kong',
+        day: '2-digit',
+        month: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hourCycle: 'h23'
+    }).formatToParts(new Date(n));
+    const pick = type => {
+        const p = parts.find(x => x.type === type);
+        return p ? p.value : '';
+    };
+    return pick('day') + '/' + pick('month') + ' ' + pick('hour') + ':' + pick('minute');
+}
+
 function normalizeExpense(ex) {
     if (!ex || typeof ex !== 'object') return null;
     let splitUsers;
@@ -278,6 +297,8 @@ function normalizeExpense(ex) {
         splitUsers = [...accMembers];
     }
     if (!splitUsers.length) splitUsers = [...accMembers];
+    const updatedAt = typeof ex.updatedAt === 'number' ? ex.updatedAt : nowTs();
+    const createdAt = typeof ex.createdAt === 'number' ? ex.createdAt : updatedAt;
     return {
         id: ex.id || genId(),
         desc: String(ex.desc || ''),
@@ -285,7 +306,8 @@ function normalizeExpense(ex) {
         splitUsers,
         currency: ex.currency === 'HKD' ? 'HKD' : 'JPY',
         amount: Number(ex.amount) || 0,
-        updatedAt: typeof ex.updatedAt === 'number' ? ex.updatedAt : nowTs(),
+        createdAt,
+        updatedAt,
         deleted: !!ex.deleted
     };
 }
@@ -817,6 +839,7 @@ function renderAccounting() {
         <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-gray-100 mb-2">
             <div class="flex-1 min-w-0 pr-2">
                 <div class="font-bold text-gray-800 truncate">${escapeHtml(ex.desc)}</div>
+                <div class="text-[11px] text-slate-500 mt-0.5 font-medium" title="記錄時間（香港）"><i class="fa-regular fa-clock mr-1"></i>${escapeHtml(formatLoggedAt(ex.createdAt))}</div>
                 <div class="text-xs mt-1 flex flex-wrap gap-1 items-center">
                     <span class="text-green-700 font-bold bg-green-50 px-1 rounded border border-green-200">墊: ${escapeHtml(ex.payer)}</span>
                     <i class="fa-solid fa-arrow-right mx-0.5 text-gray-400"></i>
@@ -1032,7 +1055,9 @@ function saveEditedExpense() {
         splitUsers: tempEditSplitUsers,
         currency,
         amount,
-        updatedAt: nowTs()
+        createdAt: oldEx.createdAt,
+        updatedAt: nowTs(),
+        deleted: !!oldEx.deleted
     });
     saveAccData('修改紀錄', `將 [${oldEx.desc} ${oldEx.currency}${oldEx.amount}] 改為 [${desc} ${currency}${amount}] (墊支:${tempEditPayer}, 分攤:${formatSplitLabel(tempEditSplitUsers)})`);
     closeEditModal();
@@ -1052,6 +1077,7 @@ function addExpense() {
     }
     const savedPayer = selectedPayer;
     const savedSplit = [...selectedSplitUsers];
+    const loggedAt = nowTs();
     accData.expenses.push(normalizeExpense({
         id: genId(),
         desc,
@@ -1059,7 +1085,8 @@ function addExpense() {
         splitUsers: savedSplit,
         currency,
         amount,
-        updatedAt: nowTs()
+        createdAt: loggedAt,
+        updatedAt: loggedAt
     }));
     selectedPayer = 'Wing';
     selectedSplitUsers = [...accMembers];
