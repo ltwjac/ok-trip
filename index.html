@@ -127,7 +127,7 @@
 <div id="pwd-modal" style="display:none" class="fixed inset-0 bg-slate-900/60 z-[60] flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full">
         <h3 class="text-lg font-bold text-gray-800 mb-2"><i class="fa-solid fa-lock mr-2 text-red-600"></i>查看 Log</h3>
-        <p class="text-sm text-gray-600 mb-4">輸入通行碼解鎖紀錄（僅溫和阻嚇，非真加密）：</p>
+        <p class="text-sm text-gray-600 mb-4">輸入通行碼解鎖紀錄：</p>
         <input type="password" id="pwd-input" autocomplete="off" onkeydown="if(event.key==='Enter')submitPassphrase()" class="w-full p-3 border-2 border-gray-300 rounded mb-2 focus:border-indigo-500 focus:outline-none font-mono text-center tracking-widest text-lg">
         <p id="pwd-error" class="text-red-500 text-xs font-bold mb-4 hidden">通行碼錯誤</p>
         <div class="flex gap-2">
@@ -198,36 +198,38 @@ const commonExpensePresets = ['早餐', '午餐', '晚餐', '油費', '高速公
 const AUDIT_PASS_HASH = '3afddfdd432759f906ff30983fbecfd56b022e56433b598d2b04e3193c641659';
 
 const itineraryData = [
-    { day: 'D1', title: '那霸機場拎車', isHotel: false, color: '#3b82f6', travelTime: '機場出發', parking: '機場周邊租車公司停車場', desc: '抵達沖繩，辦理租車手續，檢查車輛準備出發！', searchQuery: '那霸機場 租車' },
-    { day: 'D1', title: '殘波岬燈塔 & 壯麗斷崖', isHotel: false, color: '#3b82f6', travelTime: '約 1小時', parking: '免費停車場', desc: '欣賞壯觀的海岸線斷崖與白色燈塔。', searchQuery: '殘波岬燈塔 沖繩' },
-    { day: 'D1', title: '浜の家海鮮食堂 午餐', isHotel: false, color: '#3b82f6', travelTime: '約 15分鐘', parking: '餐廳專屬停車場 (免費)', desc: '享用當地新鮮海產，必吃奶油烤魚。', searchQuery: '浜の家海鮮食堂 恩納村' },
-    { day: 'D1', title: 'グランディオーソ沖縄プールヴィラ恩納 7D (11-12 Nov)', isHotel: true, color: '#ef4444', travelTime: '約 20分鐘', parking: '住宿附設停車位', desc: '〒904-0402 沖縄県国頭郡恩納村安富祖1854-7。辦理登記入住，兄弟們的秘密基地！', searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
-    { day: 'D1', title: '恩納村海灘水上活動', isHotel: false, color: '#3b82f6', travelTime: '約 5分鐘', parking: '海灘公共停車場', desc: '沙灘排球或水上活動，盡情放電。', searchQuery: '恩納村 海灘' },
-    { day: 'D1', title: '琉球之牛 (恩納店) 晚餐', isHotel: false, color: '#3b82f6', travelTime: '約 10分鐘', parking: '餐廳專屬/附近收費停車場', desc: '頂級沖繩和牛燒肉，為第一日畫上完美句號。', searchQuery: '琉球之牛 恩納店' },
+    { day: 'D1', time: '13:10', title: 'HB336 抵達那霸機場', isHotel: false, color: '#3b82f6', travelTime: '落地', parking: '機場', desc: '香港 09:45 起飛 → 沖繩 13:10 抵達。過關拎行李後去 Clover 接駁點。', searchQuery: '那霸機場' },
+    { day: 'D1', time: '14:30', title: 'Clover 借車（Voxy 或類似）', isHotel: false, color: '#3b82f6', travelTime: '接駁約 15分鐘', parking: 'Clover 停車場', desc: '訂單取車 14:30（HB336 落地後過關＋接駁）。檢查車況、保險、入油規矩；導航用電話即可。', searchQuery: '那霸機場 租車 Clover' },
+    { day: 'D1', time: '15:30', title: '殘波岬燈塔 & 壯麗斷崖', isHotel: false, color: '#3b82f6', travelTime: '約 50–60分鐘', parking: '免費停車場', desc: '北上途中停殘波岬，睇燈塔同斷崖打卡（約 45 分鐘）。', searchQuery: '殘波岬燈塔 沖繩' },
+    { day: 'D1', time: '16:30', title: '浜の家海鮮食堂 遲午餐', isHotel: false, color: '#3b82f6', travelTime: '約 15分鐘', parking: '餐廳專屬停車場 (免費)', desc: '當地新鮮海產，奶油烤魚必試。', searchQuery: '浜の家海鮮食堂 恩納村' },
+    { day: 'D1', time: '17:45', title: 'グランディオーソ沖縄プールヴィラ恩納 7D 入住', isHotel: true, color: '#ef4444', travelTime: '約 20分鐘', parking: '住宿附設停車位', desc: '〒904-0402 恩納村安富祖1854-7。Trip.com 訂單 1578951053121146／PIN 1480；16:00–23:00 入住。兄弟們的秘密基地！', searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
+    { day: 'D1', time: '18:30', title: '恩納村海灘水上活動', isHotel: false, color: '#3b82f6', travelTime: '約 5分鐘', parking: '海灘公共停車場', desc: '沙灘排球或水上活動，盡情放電。', searchQuery: '恩納村 海灘' },
+    { day: 'D1', time: '19:45', title: '琉球之牛 (恩納店) 晚餐', isHotel: false, color: '#3b82f6', travelTime: '約 10分鐘', parking: '餐廳專屬/附近收費停車場', desc: '頂級沖繩和牛燒肉，第一日完結。建議預留位。', searchQuery: '琉球之牛 恩納店' },
 
-    { day: 'D2', title: 'グランディオーソ沖縄プールヴィラ恩納 7D 出發', isHotel: true, color: '#10b981', travelTime: '起點', parking: '住宿附設停車位', desc: '早上集合出發。', searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
-    { day: 'D2', title: '青之洞窟 (真榮田岬) 浮潛', isHotel: false, color: '#10b981', travelTime: '約 20分鐘', parking: '真榮田岬收費停車場', desc: '探索神秘的藍洞，欣賞豐富海洋生態。', searchQuery: '真榮田岬 青之洞窟' },
-    { day: 'D2', title: '恩納村阿古豬涮涮鍋 午餐', isHotel: false, color: '#10b981', travelTime: '約 10分鐘', parking: '餐廳提供', desc: '品嚐鮮甜美味的阿古豬涮涮鍋，補充體力。', searchQuery: '恩納村 阿古豬' },
-    { day: 'D2', title: 'Yambaru ATV 四輪越野車', isHotel: false, color: '#10b981', travelTime: '約 40分鐘', parking: '活動場地免費停車', desc: '穿越叢林，體驗刺激的四輪越野車！', searchQuery: 'Yambaru ATV 沖繩' },
-    { day: 'D2', title: '別墅 BBQ 晚餐', isHotel: false, color: '#10b981', travelTime: '約 30分鐘', parking: '別墅停車', desc: '兄弟在別墅享用 BBQ 晚餐，痛快暢飲。', searchQuery: '恩納村 BBQ' },
+    { day: 'D2', time: '09:00', title: '別墅出發', isHotel: true, color: '#10b981', travelTime: '起點', parking: '住宿附設停車位', desc: '早上集合出發。', searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
+    { day: 'D2', time: '09:30', title: '青之洞窟 (真榮田岬) 浮潛', isHotel: false, color: '#10b981', travelTime: '約 20分鐘', parking: '真榮田岬收費停車場', desc: '09:30–11:30 藍洞浮潛。旺季建議預早預約店家。', searchQuery: '真榮田岬 青之洞窟' },
+    { day: 'D2', time: '12:00', title: '恩納村阿古豬涮涮鍋 午餐', isHotel: false, color: '#10b981', travelTime: '約 10分鐘', parking: '餐廳提供', desc: '阿古豬涮涮鍋補能量。', searchQuery: '恩納村 阿古豬' },
+    { day: 'D2', time: '14:00', title: 'Yambaru ATV 四輪越野車', isHotel: false, color: '#10b981', travelTime: '約 40分鐘', parking: '活動場地免費停車', desc: '14:00–16:30 叢林 ATV（含車程）。務必預早訂場次。', searchQuery: 'Yambaru ATV 沖繩' },
+    { day: 'D2', time: '17:30', title: '返別墅休整', isHotel: false, color: '#10b981', travelTime: '約 30分鐘', parking: '別墅停車', desc: '沖涼、買 BBQ 食材／啤酒。', searchQuery: '恩納村 超市' },
+    { day: 'D2', time: '19:00', title: '別墅 BBQ 晚餐', isHotel: false, color: '#10b981', travelTime: '原地', parking: '別墅停車', desc: '兄弟 BBQ，痛快暢飲。', searchQuery: '恩納村 BBQ' },
 
-    { day: 'D3', title: 'グランディオーソ沖縄プールヴィラ恩納 7D 退房出發', isHotel: true, color: '#8b5cf6', travelTime: '起點', parking: '住宿附設停車位', desc: '收拾行李，告別恩納村基地。', searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
-    { day: 'D3', title: '本部町 午餐 (燒肉/海邦丸)', isHotel: false, color: '#8b5cf6', travelTime: '約 40分鐘', parking: '周邊停車場', desc: '燒肉本部牧場或海邦丸海鮮丼，為婚禮前夕補充能量。', searchQuery: '海邦丸 本部町' },
-    { day: 'D3', title: 'Hotel Mahaina 登記入住', isHotel: true, color: '#8b5cf6', travelTime: '約 10分鐘', parking: '酒店停車場 (免費/住客專屬)', desc: '入住渡假村，換上戰衣準備出席婚禮！', searchQuery: 'Hotel Mahaina Wellness Resort Okinawa' },
-    { day: 'D3', title: '婚禮專車接送與晚宴狂歡 💍', isHotel: false, color: '#8b5cf6', travelTime: '專車接送', parking: '不適用', desc: '見證兄弟人生大事！狂歡慶祝不醉無歸。', searchQuery: 'Okinawa Wedding' },
+    { day: 'D3', time: '09:30', title: '別墅退房出發', isHotel: true, color: '#8b5cf6', travelTime: '起點', parking: '住宿附設停車位', desc: '10:00 前退房。收拾行李，告別恩納村基地。', searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
+    { day: 'D3', time: '11:00', title: '本部町 午餐 (燒肉/海邦丸)', isHotel: false, color: '#8b5cf6', travelTime: '約 40分鐘', parking: '周邊停車場', desc: '燒肉本部牧場或海邦丸海鮮丼。', searchQuery: '海邦丸 本部町' },
+    { day: 'D3', time: '13:00', title: '本部一帶休整／換裝', isHotel: false, color: '#8b5cf6', travelTime: '視婚禮時間', parking: '酒店／附近', desc: '留白給婚禮前準備；時間可按正式請柬微調。', searchQuery: 'Hotel Mahaina Wellness Resort Okinawa' },
+    { day: 'D3', time: '15:00', title: 'Hotel Mahaina 登記入住', isHotel: true, color: '#8b5cf6', travelTime: '約 10分鐘', parking: '酒店停車場 (免費/住客專屬)', desc: 'Trip.com 訂單 1578950516629519／PIN 7633；15:00 後入住。換上戰衣！', searchQuery: 'Hotel Mahaina Wellness Resort Okinawa' },
+    { day: 'D3', time: '17:00', title: '婚禮專車接送與晚宴狂歡 💍', isHotel: false, color: '#8b5cf6', travelTime: '專車接送', parking: '不適用', desc: '時間按請柬為準（暫定傍晚）。見證兄弟大事，狂歡不醉無歸。', searchQuery: 'Okinawa Wedding' },
 
-    { day: 'D4', title: 'Hotel Mahaina 退房出發', isHotel: true, color: '#f97316', travelTime: '起點', parking: '酒店停車場', desc: '帶著宿醉(可能)退房，向南部進發。', searchQuery: 'Hotel Mahaina Wellness Resort Okinawa' },
-    { day: 'D4', title: '美濱美國村', isHotel: false, color: '#f97316', travelTime: '約 1小時 10分', parking: '美國村大型免費停車場', desc: '異國風情街區，打卡買潮物。', searchQuery: '美國村 沖繩' },
-    { day: 'D4', title: 'AEON Mall Okinawa Rycom', isHotel: false, color: '#f97316', travelTime: '約 15分鐘', parking: '商場巨型免費停車場', desc: '沖繩最大型購物中心，瘋狂Shopping。', searchQuery: 'AEON Mall Okinawa Rycom' },
-    { day: 'D4', title: 'INFINISIS NAHA SHURIJO by 休伊特度假村 (14 Nov)', isHotel: true, color: '#f97316', travelTime: '約 40分鐘', parking: '附近收費停車場', desc: '40 Matsugawa, Naha 902-0062。登記入住那霸市區新酒店。', searchQuery: 'INFINISIS NAHA SHURIJO 休伊特度假村' },
-    { day: 'D4', title: '國際通購物', isHotel: false, color: '#f97316', travelTime: '步行', parking: '不適用', desc: '最後衝刺買手信。', searchQuery: '國際通 沖繩' },
-    { day: 'D4', title: '國際通屋台村 晚餐 🏮', isHotel: false, color: '#f97316', travelTime: '步行', parking: '不適用', desc: '體驗日本屋台文化，串燒啤酒傾計。', searchQuery: '國際通屋台村' },
+    { day: 'D4', time: '11:00', title: 'Hotel Mahaina 退房出發', isHotel: true, color: '#f97316', travelTime: '起點', parking: '酒店停車場', desc: '11:00 前退房，南下那霸方向。', searchQuery: 'Hotel Mahaina Wellness Resort Okinawa' },
+    { day: 'D4', time: '12:30', title: '美濱美國村', isHotel: false, color: '#f97316', travelTime: '約 1小時 10分', parking: '美國村大型免費停車場', desc: '12:30–14:30 打卡買潮物、隨便食個 lunch。', searchQuery: '美國村 沖繩' },
+    { day: 'D4', time: '15:00', title: 'AEON Mall Okinawa Rycom', isHotel: false, color: '#f97316', travelTime: '約 15分鐘', parking: '商場巨型免費停車場', desc: '15:00–17:00 血拼；手信可喺度買齊。', searchQuery: 'AEON Mall Okinawa Rycom' },
+    { day: 'D4', time: '17:30', title: 'INFINISIS NAHA SHURIJO 入住', isHotel: true, color: '#f97316', travelTime: '約 40分鐘', parking: '附近收費停車場', desc: '那霸市松川 40。Trip.com 訂單 1578951053182664／PIN 5143；15:00 後入住。', searchQuery: 'INFINISIS NAHA SHURIJO 休伊特度假村' },
+    { day: 'D4', time: '18:30', title: '國際通購物', isHotel: false, color: '#f97316', travelTime: '步行／短泊車', parking: '周邊收費停車場', desc: '最後衝刺買手信。', searchQuery: '國際通 沖繩' },
+    { day: 'D4', time: '20:00', title: '國際通屋台村 晚餐 🏮', isHotel: false, color: '#f97316', travelTime: '步行', parking: '不適用', desc: '屋台串燒啤酒，收工。', searchQuery: '國際通屋台村' },
 
-    { day: 'D5', title: 'INFINISIS NAHA SHURIJO 退房出發', isHotel: true, color: '#ec4899', travelTime: '起點', parking: '收費停車場', desc: '最後一日行程開始。', searchQuery: 'INFINISIS NAHA SHURIJO 休伊特度假村' },
-    { day: 'D5', title: '瀨長島 Umikaji Terrace', isHotel: false, color: '#ec4899', travelTime: '約 20分鐘', parking: '瀨長島免費停車場 (容易爆滿)', desc: '希臘風情純白建築，看飛機升降兼食幸福Pancake。', searchQuery: '瀨長島 Umikaji Terrace' },
-    { day: 'D5', title: '琉球新麵通堂 (小祿本店)', isHotel: false, color: '#ec4899', travelTime: '約 15分鐘', parking: '餐廳附設停車場', desc: '必試男人麵/女人麵，完美拉麵結尾。', searchQuery: '琉球新麵通堂 小祿本店' },
-    { day: 'D5', title: 'ASHIBINAA Outlet', isHotel: false, color: '#ec4899', travelTime: '約 10分鐘', parking: 'Outlet 免費停車場', desc: '臨上機前最後血拼。', searchQuery: 'ASHIBINAA Outlet 沖繩' },
-    { day: 'D5', title: '那霸機場還車返港 ✈️', isHotel: false, color: '#ec4899', travelTime: '約 15分鐘', parking: '租車公司還車點', desc: '還車，搭乘航班平安返回香港，兄弟旅行圓滿結束！', searchQuery: '那霸機場 租車' }
+    { day: 'D5', time: '08:30', title: 'INFINISIS 退房出發', isHotel: true, color: '#ec4899', travelTime: '起點', parking: '收費停車場', desc: '11:00 前退房；盡早出發趕還車。通堂／Outlet 因還車時間緊，改到 D4 買齊或略過。', searchQuery: 'INFINISIS NAHA SHURIJO 休伊特度假村' },
+    { day: 'D5', time: '09:00', title: '瀨長島 Umikaji Terrace', isHotel: false, color: '#ec4899', travelTime: '約 20分鐘', parking: '瀨長島免費停車場 (容易爆滿)', desc: '09:00–10:20 早餐＋打卡睇飛機。唔好拖。', searchQuery: '瀨長島 Umikaji Terrace' },
+    { day: 'D5', time: '10:40', title: '機場附近入滿油', isHotel: false, color: '#ec4899', travelTime: '約 10–15分鐘', parking: '油站', desc: '還車前必須加滿 Regular，保留收據。', searchQuery: '那霸機場 加油站' },
+    { day: 'D5', time: '11:30', title: 'Clover 還車 → 機場過關 ✈️', isHotel: false, color: '#ec4899', travelTime: '接駁約 15分鐘', parking: 'Clover 還車點', desc: '訂單還車 11:30（HB337 14:10）。之後接駁入機場過關。', searchQuery: '那霸機場 租車 Clover' }
 ];
 
 const dayTitles = {
@@ -235,7 +237,7 @@ const dayTitles = {
     D2: 'Day 2 (青之洞窟 / ATV)',
     D3: 'Day 3 (本部町 / 婚禮)',
     D4: 'Day 4 (美國村 / 國際通)',
-    D5: 'Day 5 (瀨長島 / 返港)'
+    D5: 'Day 5 (瀨長島 / 還車返港)'
 };
 
 let currentTab = 'ALL';
@@ -283,7 +285,8 @@ function normalizeExpense(ex) {
         splitUsers,
         currency: ex.currency === 'HKD' ? 'HKD' : 'JPY',
         amount: Number(ex.amount) || 0,
-        updatedAt: typeof ex.updatedAt === 'number' ? ex.updatedAt : nowTs()
+        updatedAt: typeof ex.updatedAt === 'number' ? ex.updatedAt : nowTs(),
+        deleted: !!ex.deleted
     };
 }
 
@@ -532,6 +535,52 @@ function renderContent(tab) {
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 w-full mb-12">
                 <h2 class="text-2xl font-bold mb-4 text-blue-800"><i class="fa-solid fa-book-open mr-2"></i>行車及求生手冊</h2>
                 <div class="space-y-4">
+                    <div class="bg-sky-50 p-4 rounded-lg border border-sky-100">
+                        <h3 class="font-bold text-sky-900 mb-2"><i class="fa-solid fa-plane mr-2"></i>航班資料（大灣區航空）</h3>
+                        <ul class="list-disc pl-5 text-sm text-gray-700 space-y-2">
+                            <li><b>去程 11/11</b>：HB336　香港 HKG 09:45 → 沖繩 OKA 13:10（約 2 小時 25 分）　機型波音 73A　票價「好想飛 (U)」　行李 20KG</li>
+                            <li><b>回程 15/11</b>：HB337　沖繩 OKA 14:10 → 香港 HKG 16:05（約 2 小時 55 分）　機型波音 73A　票價「好想飛 (T)」　行李 20KG</li>
+                            <li>去程落地後約 14:30 借車；回程 11:30 還車（預留入油＋接駁＋過關）。</li>
+                        </ul>
+                    </div>
+                    <div class="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
+                        <h3 class="font-bold text-emerald-900 mb-2"><i class="fa-solid fa-hotel mr-2"></i>住宿確認（Trip.com）</h3>
+                        <ul class="list-disc pl-5 text-sm text-gray-700 space-y-3">
+                            <li>
+                                <b>グランディオーソ沖縄プールヴィラ恩納 7／沖繩豪華泳池別墅恩納 7</b><br>
+                                11/11 16:00–23:00 入住 → 13/11 10:00 前退房（2 晚）・至尊沖繩泳池別墅恩納 7d・可住 12 人・無餐<br>
+                                〒904-0402 沖縄県国頭郡恩納村安富祖 1854-7・約距那霸機場 43 km・電話 +81-50-3138-6036<br>
+                                訂單 <b>1578951053121146</b>・PIN <b>1480</b>・已付 HK$1,975.46<br>
+                                取消：11/3 18:00（酒店當地）後取消費 HK$987.73・特別要求：需要泊車位；BBQ 未定日期
+                            </li>
+                            <li>
+                                <b>Hotel Mahaina Wellness Resorts Okinawa（沖繩馬海納健康度假酒店）</b><br>
+                                13/11 15:00 後入住 → 14/11 11:00 前退房（1 晚）・1 房・無餐<br>
+                                〒905-0205 沖縄県国頭郡本部町山川 1456・電話 +81-980-51-7700<br>
+                                訂單 <b>1578950516629519</b>・PIN <b>7633</b>・已付 HK$1,211.45（Mastercard ****9524，11/5 已扣）<br>
+                                免費取消至 11/7 23:59（酒店當地）
+                            </li>
+                            <li>
+                                <b>INFINISIS NAHA SHURIJO by 休伊特度假村</b><br>
+                                14/11 15:00 後入住 → 15/11 11:00 前退房（1 晚）・豪華雙床房・可住 4 人・約 34 m²・無餐<br>
+                                〒902-0062 沖縄県那覇市松川 40・電話 +81-98-887-1111<br>
+                                訂單 <b>1578951053182664</b>・PIN <b>5143</b>・應付 HK$890.12（Mastercard ****9524，酒店當地 11/12 扣款）<br>
+                                免費取消至 11/13 23:59（酒店當地）
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-violet-50 p-4 rounded-lg border border-violet-100">
+                        <h3 class="font-bold text-violet-900 mb-2"><i class="fa-solid fa-key mr-2"></i>租車（已訂 Clover）</h3>
+                        <ul class="list-disc pl-5 text-sm text-gray-700 space-y-2">
+                            <li><b>供應商</b>：Clover（Trip.com.hk）— Toyota Voxy 或類似</li>
+                            <li><b>訂單</b>：<b>1688902392366643</b>・PIN <b>7595</b>（取車用，唔好外傳）・<a href="https://hk.trip.com/carhire/order/1688902392366643" target="_blank" rel="noopener" class="text-violet-700 underline">訂單頁</a></li>
+                            <li><b>已付</b>：HK$1,661.19（租金 HK$1,144.19 ＋ 高級／零自負額 HK$517）</li>
+                            <li><b>借車</b>：11/11 <b>14:30</b>　那霸機場 Clover 櫃台（沖縄県豊見城市豊見城 361-2）；免費接駁約 15 分鐘</li>
+                            <li><b>還車</b>：15/11 <b>11:30</b>　同一櫃台；還車前入滿油留收據</li>
+                            <li><b>司機</b>：LI TSZ WING・航班 HB336</li>
+                            <li><b>免費取消</b>：至 6/11 14:30（當地）</li>
+                        </ul>
+                    </div>
                     <div class="bg-blue-50 p-4 rounded-lg">
                         <h3 class="font-bold text-blue-900 mb-2"><i class="fa-solid fa-car-side mr-2"></i>自駕注意事項</h3>
                         <ul class="list-disc pl-5 text-sm text-gray-700 space-y-2">
@@ -584,7 +633,7 @@ function renderContent(tab) {
                 const mapsLink = getGoogleMapsLink(pt.searchQuery);
                 allHtml += `
                     <li class="flex flex-col border-b border-gray-50 pb-3 gap-1">
-                        <div class="font-semibold text-gray-800 text-base">${pt.isHotel ? '🏠 ' : ''}${escapeHtml(pt.title)}</div>
+                        <div class="font-semibold text-gray-800 text-base">${pt.time ? `<span class="text-indigo-600 font-bold mr-2">${escapeHtml(pt.time)}</span>` : ''}${pt.isHotel ? '🏠 ' : ''}${escapeHtml(pt.title)}</div>
                         <div class="text-xs text-gray-500 mb-1">${escapeHtml(pt.desc)}</div>
                         <a href="${mapsLink}" target="_blank" rel="noopener noreferrer" class="self-start inline-flex bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-medium items-center transition-colors">
                             <i class="fa-solid fa-location-arrow mr-1"></i> Google 地圖搜尋
@@ -611,7 +660,7 @@ function renderContent(tab) {
                     ${iconHtml}
                 </div>
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                    <h3 class="font-bold text-lg text-gray-800 mb-1">${escapeHtml(pt.title)}</h3>
+                    <h3 class="font-bold text-lg text-gray-800 mb-1">${pt.time ? `<span class="inline-block bg-indigo-100 text-indigo-700 text-sm font-bold px-2 py-0.5 rounded mr-2">${escapeHtml(pt.time)}</span>` : ''}${escapeHtml(pt.title)}</h3>
                     <p class="text-sm text-gray-600 mb-3">${escapeHtml(pt.desc)}</p>
                     <div class="grid grid-cols-2 gap-2 text-xs text-gray-500 mb-3 bg-gray-50 p-2 rounded-lg">
                         <div><i class="fa-solid fa-clock mr-1"></i> 行車: ${escapeHtml(pt.travelTime)}</div>
@@ -637,9 +686,14 @@ function formatSplitLabel(splitUsers) {
 }
 
 function expenseMatchesFilter(ex) {
+    if (ex.deleted) return false;
     if (selectedFilterUser === '全部') return true;
     if (ex.payer === selectedFilterUser) return true;
     return (ex.splitUsers || []).includes(selectedFilterUser);
+}
+
+function activeExpenses() {
+    return (accData.expenses || []).filter(ex => !ex.deleted);
 }
 
 function computeSettlement() {
@@ -648,7 +702,7 @@ function computeSettlement() {
     const consumed = Object.fromEntries(accMembers.map(m => [m, 0]));
     let totalHKD = 0;
 
-    accData.expenses.forEach(ex => {
+    activeExpenses().forEach(ex => {
         const hkd = toHKD(ex);
         totalHKD += hkd;
         paid[ex.payer] += hkd;
@@ -1015,14 +1069,21 @@ function addExpense() {
 }
 
 function requestDelete(id) {
-    showConfirm('確定要刪除這筆紀錄嗎？', () => executeDelete(id));
+    showConfirm('確定要刪除這筆紀錄嗎？', () => {
+        showConfirm('唔好以為靜靜雞delete左無人知😏', () => executeDelete(id), '仍然刪除', '取消');
+    });
 }
 
 function executeDelete(id) {
     const idx = accData.expenses.findIndex(e => e.id === id);
     if (idx < 0) return;
     const ex = accData.expenses[idx];
-    accData.expenses.splice(idx, 1);
+    // Soft-delete so sync merge won't resurrect the row from cloud.
+    accData.expenses[idx] = normalizeExpense({
+        ...ex,
+        deleted: true,
+        updatedAt: nowTs()
+    });
     saveAccData('刪除紀錄', `刪除: ${ex.desc} (${ex.currency} ${ex.amount} 墊支:${ex.payer})`);
 }
 
