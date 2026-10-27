@@ -16,6 +16,8 @@ Repo 已設定 Pages 由 **`main` 分支根目錄** 提供網站（`index.html`�
 2. 建立 KV namespace，綁定名稱必須係 `EXPENSES_KV`。
 3. 將 Worker URL 貼入 `index.html` 嘅 `CLOUDFLARE_API_URL`，再部署／推上 `main`。
 
+目前同步指向 [`https://ok-trip-expenses.ltwjac.workers.dev`](https://ok-trip-expenses.ltwjac.workers.dev)。
+
 客戶端會按支出 `id` 合併，較新嘅 `updatedAt` 勝出。`CLOUDFLARE_API_URL` 留空就只係本地記帳。
 
 改動同已知問題見 `ISSUES.md`。
