@@ -130,6 +130,22 @@
         .map-nav-btn:hover { background: #1d4ed8; }
         .map-search-btn { background: #059669; }
         .map-search-btn:hover { background: #047857; }
+        .map-show-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            background: #4f46e5;
+            color: #fff;
+            padding: 0.4rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+        .map-show-btn:hover { background: #4338ca; }
     </style>
 </head>
 <body>
@@ -569,6 +585,9 @@ function getNavLink(pt) {
 
 function placeActionButtonsHtml(pt, opts) {
     const full = !!(opts && opts.fullWidth);
+    const day = opts && opts.day;
+    const idx = opts && typeof opts.idx === 'number' ? opts.idx : null;
+    const showMap = day != null && idx != null;
     const search = getGoogleSearchLink(pt);
     const nav = getNavLink(pt);
     const wrap = full
@@ -577,21 +596,44 @@ function placeActionButtonsHtml(pt, opts) {
     const btnBase = full
         ? 'inline-flex items-center justify-center font-medium py-2 px-3 rounded-lg transition-colors text-sm cursor-pointer'
         : 'self-start inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium transition-colors';
-    return '<div class="' + wrap + '">' +
+    let html = '<div class="' + wrap + '">' +
         '<a href="' + search + '" target="_blank" rel="noopener noreferrer" class="' + btnBase + ' bg-emerald-50 hover:bg-emerald-100 text-emerald-700">' +
         '<i class="fa-solid fa-magnifying-glass mr-1"></i> Google 搜尋</a>' +
         '<a href="' + nav + '" target="_blank" rel="noopener noreferrer" class="' + btnBase + ' bg-blue-50 hover:bg-blue-100 text-blue-600">' +
-        '<i class="fa-solid fa-diamond-turn-right mr-1"></i> 導航到這裏</a>' +
-        '</div>';
+        '<i class="fa-solid fa-diamond-turn-right mr-1"></i> 導航到這裏</a>';
+    if (showMap) {
+        const mapBtnClass = full
+            ? 'col-span-2 inline-flex items-center justify-center font-medium py-2 px-3 rounded-lg transition-colors text-sm cursor-pointer bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-100'
+            : 'self-start inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-100';
+        html += '<button type="button" onclick="showStopOnMap(\'' + day + '\',' + idx + ')" class="' + mapBtnClass + '">' +
+            '<i class="fa-solid fa-map-location-dot mr-1"></i> 喺地圖顯示</button>';
+    }
+    html += '</div>';
+    return html;
 }
 
 let dayMapInstance = null;
+let dayMapMarkers = [];
+let dayMapDayId = null;
+
+/** Display-only spiral offset so stacked identical coords stay visible. */
+function displayLatLng(pt, dupIndex) {
+    if (!dupIndex) return [pt.lat, pt.lng];
+    const angle = dupIndex * 2.399963229728653; // golden angle
+    const radius = 0.00028 * dupIndex; // ~30m steps
+    const dLat = pt.lat + radius * Math.cos(angle);
+    const cosLat = Math.cos(pt.lat * Math.PI / 180) || 1;
+    const dLng = pt.lng + (radius * Math.sin(angle)) / cosLat;
+    return [dLat, dLng];
+}
 
 function destroyDayMap() {
     if (dayMapInstance) {
         dayMapInstance.remove();
         dayMapInstance = null;
     }
+    dayMapMarkers = [];
+    dayMapDayId = null;
 }
 
 function initDayMap(dayId, points) {
@@ -604,14 +646,21 @@ function initDayMap(dayId, points) {
         return;
     }
     dayMapInstance = L.map(el, { scrollWheelZoom: false });
+    dayMapDayId = dayId;
+    dayMapMarkers = new Array(points.length).fill(null);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Tiles &copy; Esri',
         maxZoom: 19
     }).addTo(dayMapInstance);
 
+    const dupSeen = Object.create(null);
     const bounds = [];
-    withCoords.forEach((pt, i) => {
-        const n = i + 1;
+    points.forEach((pt, idx) => {
+        if (typeof pt.lat !== 'number' || typeof pt.lng !== 'number') return;
+        const key = pt.lat.toFixed(6) + ',' + pt.lng.toFixed(6);
+        const dupIndex = dupSeen[key] || 0;
+        dupSeen[key] = dupIndex + 1;
+        const n = idx + 1; // same as timeline blue badges (all stops incl. hotels)
         const icon = L.divIcon({
             className: '',
             html: '<div class="map-marker-num">' + n + '</div>',
@@ -619,6 +668,7 @@ function initDayMap(dayId, points) {
             iconAnchor: [14, 14],
             popupAnchor: [0, -14]
         });
+        // True coords for Google Maps nav/search; offset only for marker display
         const nav = getDirectionsLink(pt.lat, pt.lng);
         const search = getGoogleSearchLink(pt);
         const popupHtml =
@@ -630,9 +680,11 @@ function initDayMap(dayId, points) {
             '<i class="fa-solid fa-magnifying-glass"></i> Google 搜尋</a>' +
             '<a class="map-nav-btn" href="' + nav + '" target="_blank" rel="noopener noreferrer">' +
             '<i class="fa-solid fa-diamond-turn-right"></i> 導航到這裏</a></div></div>';
-        const marker = L.marker([pt.lat, pt.lng], { icon }).addTo(dayMapInstance);
+        const displayLL = displayLatLng(pt, dupIndex);
+        const marker = L.marker(displayLL, { icon }).addTo(dayMapInstance);
         marker.bindPopup(popupHtml);
-        bounds.push([pt.lat, pt.lng]);
+        dayMapMarkers[idx] = marker;
+        bounds.push(displayLL);
     });
     if (bounds.length === 1) {
         dayMapInstance.setView(bounds[0], 14);
@@ -641,6 +693,29 @@ function initDayMap(dayId, points) {
     }
     setTimeout(() => { if (dayMapInstance) dayMapInstance.invalidateSize(); }, 80);
 }
+
+function showStopOnMap(day, idx) {
+    const open = () => {
+        const mapEl = document.getElementById('day-map-' + day);
+        if (mapEl) {
+            mapEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        const marker = dayMapMarkers[idx];
+        if (!marker || !dayMapInstance) return;
+        const ll = marker.getLatLng();
+        const z = Math.max(dayMapInstance.getZoom() || 13, 14);
+        dayMapInstance.setView(ll, z);
+        marker.openPopup();
+        setTimeout(() => { if (dayMapInstance) dayMapInstance.invalidateSize(); }, 100);
+    };
+    if (currentTab !== day) {
+        switchTab(day);
+        setTimeout(open, 120);
+    } else {
+        open();
+    }
+}
+window.showStopOnMap = showStopOnMap;
 
 function switchTab(tab) {
     currentTab = tab;
@@ -803,12 +878,12 @@ function renderContent(tab) {
                         ${escapeHtml(dayTitles[d])}
                     </h3>
                     <ul class="space-y-3 text-sm">`;
-            dayPoints.forEach(pt => {
+            dayPoints.forEach((pt, idx) => {
                 allHtml += `
                     <li class="flex flex-col border-b border-gray-50 pb-3 gap-1">
-                        <div class="font-semibold text-gray-800 text-base">${pt.time ? `<span class="text-indigo-600 font-bold mr-2">${escapeHtml(pt.time)}</span>` : ''}${pt.isHotel ? '🏠 ' : ''}${escapeHtml(pt.title)}</div>
+                        <div class="font-semibold text-gray-800 text-base"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-900 text-white text-[10px] font-bold mr-1.5 align-middle">${idx + 1}</span>${pt.time ? `<span class="text-indigo-600 font-bold mr-2">${escapeHtml(pt.time)}</span>` : ''}${pt.isHotel ? '🏠 ' : ''}${escapeHtml(pt.title)}</div>
                         <div class="text-xs text-gray-500 mb-1">${escapeHtml(pt.desc)}</div>
-                        ${placeActionButtonsHtml(pt)}
+                        ${placeActionButtonsHtml(pt, { day: d, idx })}
                     </li>`;
             });
             allHtml += '</ul></div>';
@@ -848,7 +923,7 @@ function renderContent(tab) {
                         <div><i class="fa-solid fa-clock mr-1"></i> 行車: ${escapeHtml(pt.travelTime)}</div>
                         <div><i class="fa-solid fa-square-parking mr-1"></i> 泊車: ${escapeHtml(pt.parking)}</div>
                     </div>
-                    ${placeActionButtonsHtml(pt, { fullWidth: true })}
+                    ${placeActionButtonsHtml(pt, { fullWidth: true, day: tab, idx })}
                 </div>
             </div>`;
     });
