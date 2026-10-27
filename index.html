@@ -2,20 +2,53 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1e3a8a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="沖繩之旅">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>綠林快槍手沖繩之旅</title>
-    
+    <link rel="manifest" href='data:application/manifest+json,{"name":"%E7%B6%A0%E6%9E%97%E5%BF%AB%E6%A7%8D%E6%89%8B%E6%B2%96%E7%B9%A9%E4%B9%8B%E6%97%85","short_name":"%E6%B2%96%E7%B9%A9%E4%B9%8B%E6%97%85","start_url":".","display":"standalone","background_color":"#1e3a8a","theme_color":"#1e3a8a","lang":"zh-HK"}'>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        body { font-family: 'Inter', 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #f3f4f6; margin: 0; height: 100vh; overflow: hidden; }
-        #app-container { display: flex; height: 100vh; width: 100vw; flex-direction: column; overflow: hidden; }
-        .content-wrapper { display: flex; flex-direction: column; flex: 1; overflow: hidden; position: relative; }
-        .scroll-section { flex: 1; overflow-y: auto; background-color: #f9fafb; padding: 1rem; -webkit-overflow-scrolling: touch; }
-        .tabs-container { display: flex; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        body {
+            font-family: 'Inter', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            min-height: 100dvh;
+        }
+        #app-container {
+            display: flex;
+            min-height: 100dvh;
+            width: 100%;
+            flex-direction: column;
+        }
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            position: relative;
+            min-height: 0;
+        }
+        .scroll-section {
+            flex: 1;
+            overflow-y: auto;
+            background-color: #f9fafb;
+            padding: 1rem;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 3rem;
+        }
+        .tabs-container {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
         .tabs-container::-webkit-scrollbar { display: none; }
-        
+
         .timeline-item { position: relative; padding-left: 2.5rem; margin-bottom: 1.5rem; }
         .timeline-item::before {
             content: '';
@@ -42,750 +75,969 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             z-index: 10;
         }
+        .timeline-hotel-icon {
+            background-color: #ef4444;
+            font-size: 1rem;
+        }
+        .chip-on-green { background:#16a34a; color:#fff; border-color:#15803d; box-shadow:0 2px 4px rgba(0,0,0,.12); }
+        .chip-off-green { background:#fff; color:#15803d; border-color:#86efac; }
+        .chip-on-red { background:#b91c1c; color:#fff; border-color:#991b1b; box-shadow:0 2px 4px rgba(0,0,0,.12); }
+        .chip-off-red { background:#fff; color:#b91c1c; border-color:#fca5a5; }
+        .chip-on-indigo { background:#4f46e5; color:#fff; border-color:#4338ca; }
+        .chip-off-indigo { background:#fff; color:#4f46e5; border-color:#c7d2fe; }
     </style>
 </head>
 <body>
+<div id="app-container">
+    <header class="bg-white shadow-sm z-20 shrink-0">
+        <div class="px-4 py-3 flex justify-between items-center bg-blue-900 text-white gap-2">
+            <h1 class="font-bold text-lg truncate flex-1">綠林快槍手沖繩之旅</h1>
+            <span id="sync-status" class="text-[10px] bg-blue-800/80 px-2 py-1 rounded-full shrink-0 hidden" title="同步狀態"></span>
+            <button type="button" onclick="switchTab('ACCOUNTING')" id="top-acc-btn" class="bg-yellow-400 hover:bg-yellow-500 text-blue-900 px-3 py-1.5 rounded-lg font-bold text-sm shadow-md flex items-center shrink-0 transition-colors cursor-pointer">
+                <i class="fa-solid fa-wallet mr-1.5"></i> 記帳本
+            </button>
+        </div>
+        <div class="tabs-container bg-white border-b border-gray-200 px-2 py-2" id="nav-tabs">
+            <button type="button" data-tab="ALL" class="nav-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-full font-semibold mr-2 transition-colors cursor-pointer">全部</button>
+            <button type="button" data-tab="D1" class="nav-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-full font-semibold mr-2 transition-colors cursor-pointer">D1 11/11</button>
+            <button type="button" data-tab="D2" class="nav-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-full font-semibold mr-2 transition-colors cursor-pointer">D2 12/11</button>
+            <button type="button" data-tab="D3" class="nav-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-full font-semibold mr-2 transition-colors cursor-pointer">D3 13/11💍</button>
+            <button type="button" data-tab="D4" class="nav-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-full font-semibold mr-2 transition-colors cursor-pointer">D4 14/11🏮</button>
+            <button type="button" data-tab="D5" class="nav-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-full font-semibold mr-2 transition-colors cursor-pointer">D5 15/11✈️</button>
+            <button type="button" data-tab="MANUAL" class="nav-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-full font-semibold transition-colors cursor-pointer">手冊</button>
+        </div>
+    </header>
+    <div class="content-wrapper">
+        <div class="scroll-section max-w-2xl mx-auto w-full" id="sidebar-content"></div>
+    </div>
+</div>
 
-    <!-- App Container -->
-    <div id="app-container">
-        <!-- Header & Navigation -->
-        <header class="bg-white shadow-sm z-20 shrink-0">
-            <div class="px-4 py-3 flex justify-between items-center bg-blue-900 text-white">
-                <h1 class="font-bold text-lg truncate flex-1">綠林快槍手沖繩之旅</h1>
-                <button onclick="switchTab('ACCOUNTING')" id="top-acc-btn" class="bg-yellow-400 hover:bg-yellow-500 text-blue-900 px-3 py-1.5 rounded-lg font-bold text-sm shadow-md flex items-center shrink-0 ml-2 transition-colors cursor-pointer">
-                    <i class="fa-solid fa-wallet mr-1.5"></i> 記帳本
+<!-- Confirm -->
+<div id="confirm-modal" style="display:none" class="fixed inset-0 bg-slate-900/60 z-[70] flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full text-center">
+        <h3 class="text-lg font-bold text-gray-800 mb-6" id="confirm-msg"></h3>
+        <div class="flex gap-3">
+            <button type="button" id="confirm-no-btn" onclick="closeConfirmModal()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 rounded-lg cursor-pointer">取消</button>
+            <button type="button" id="confirm-yes-btn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg cursor-pointer shadow-md">確認</button>
+        </div>
+    </div>
+</div>
+
+<!-- Audit unlock (mild deterrent only; not real security) -->
+<div id="pwd-modal" style="display:none" class="fixed inset-0 bg-slate-900/60 z-[60] flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full">
+        <h3 class="text-lg font-bold text-gray-800 mb-2"><i class="fa-solid fa-lock mr-2 text-red-600"></i>查看 Log</h3>
+        <p class="text-sm text-gray-600 mb-4">輸入通行碼解鎖紀錄（僅溫和阻嚇，非真加密）：</p>
+        <input type="password" id="pwd-input" autocomplete="off" onkeydown="if(event.key==='Enter')submitPassphrase()" class="w-full p-3 border-2 border-gray-300 rounded mb-2 focus:border-indigo-500 focus:outline-none font-mono text-center tracking-widest text-lg">
+        <p id="pwd-error" class="text-red-500 text-xs font-bold mb-4 hidden">通行碼錯誤</p>
+        <div class="flex gap-2">
+            <button type="button" onclick="closePwdModal()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 rounded-lg cursor-pointer">取消</button>
+            <button type="button" onclick="submitPassphrase()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg cursor-pointer">確認</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit -->
+<div id="edit-modal" style="display:none" class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <h3 class="text-xl font-bold text-gray-800 mb-4"><i class="fa-solid fa-pen-to-square mr-2 text-indigo-600"></i>修改支出紀錄</h3>
+        <input type="hidden" id="edit-id">
+        <div class="space-y-4 mb-4">
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">項目名稱：</label>
+                <input type="text" id="edit-desc" class="p-2 border-2 border-gray-300 rounded w-full bg-white focus:outline-none focus:border-indigo-500 text-base">
+            </div>
+            <div class="bg-green-50 p-2 rounded border border-green-200">
+                <label class="block text-xs font-semibold text-green-800 mb-1">墊支者：</label>
+                <div id="edit-payer-buttons" class="flex flex-wrap gap-2"></div>
+            </div>
+            <div class="bg-red-50 p-2 rounded border border-red-200">
+                <label class="block text-xs font-semibold text-red-800 mb-2">分攤對象（可多選）：</label>
+                <div id="edit-split-buttons" class="flex flex-wrap gap-2"></div>
+            </div>
+            <div class="flex gap-2">
+                <select id="edit-currency" class="p-2 border-2 border-gray-300 rounded w-1/3 bg-white focus:outline-none focus:border-indigo-500 text-base font-bold">
+                    <option value="JPY">JPY ¥</option>
+                    <option value="HKD">HKD $</option>
+                </select>
+                <input type="number" id="edit-amount" inputmode="decimal" step="any" class="p-2 border-2 border-gray-300 rounded w-2/3 bg-white focus:outline-none focus:border-indigo-500 text-lg font-bold">
+            </div>
+        </div>
+        <div class="flex gap-2 mt-4 border-t pt-4">
+            <button type="button" onclick="closeEditModal()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 rounded-lg cursor-pointer">取消</button>
+            <button type="button" onclick="confirmSaveEditedExpense()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg cursor-pointer shadow-lg">儲存修改</button>
+        </div>
+    </div>
+</div>
+
+<!-- Audit -->
+<div id="audit-modal" style="display:none" class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl p-6 max-w-lg w-full h-[80vh] flex flex-col">
+        <h3 class="text-xl font-bold text-gray-800 mb-2"><i class="fa-solid fa-shield-halved mr-2 text-indigo-600"></i>Log</h3>
+        <p class="text-xs text-gray-500 mb-4">本地紀錄新增／修改／刪除足跡（可被清機影響，非不可竄改）。</p>
+        <div id="audit-logs-list" class="flex-1 overflow-y-auto space-y-2 border p-3 rounded bg-gray-50 text-xs font-mono"></div>
+        <div class="mt-4 pt-2 border-t flex justify-end shrink-0">
+            <button type="button" onclick="closeAuditModal()" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg cursor-pointer text-sm">關閉</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ========== 設定 ==========
+ * 部署 worker.js 後，將 Worker URL 貼喺下面（例如 https://xxx.workers.dev）
+ * 留空 = 只用本機 localStorage
+ */
+const CLOUDFLARE_API_URL = '';
+
+const STORAGE_KEY = 'greenwood_okinawa_acc_v14';
+const STORAGE_KEY_LEGACY = 'greenwood_okinawa_acc_v13';
+const accMembers = ['Wing', '天', 'Kenson', 'Michael'];
+const commonExpensePresets = ['早餐', '午餐', '晚餐', '油費', '高速公路費', '零食/飲品', '超市買嘢', '景點門票', '租車/活動', '其他'];
+
+/* Audit unlock：比對預先計算嘅 softHash 結果（僅溫和阻嚇，睇源碼可破解，唔係真保安） */
+const AUDIT_PASS_HASH = '3afddfdd432759f906ff30983fbecfd56b022e56433b598d2b04e3193c641659';
+
+const itineraryData = [
+    { day: 'D1', title: '那霸機場拎車', isHotel: false, color: '#3b82f6', travelTime: '機場出發', parking: '機場周邊租車公司停車場', desc: '抵達沖繩，辦理租車手續，檢查車輛準備出發！', searchQuery: '那霸機場 租車' },
+    { day: 'D1', title: '殘波岬燈塔 & 壯麗斷崖', isHotel: false, color: '#3b82f6', travelTime: '約 1小時', parking: '免費停車場', desc: '欣賞壯觀的海岸線斷崖與白色燈塔。', searchQuery: '殘波岬燈塔 沖繩' },
+    { day: 'D1', title: '浜の家海鮮食堂 午餐', isHotel: false, color: '#3b82f6', travelTime: '約 15分鐘', parking: '餐廳專屬停車場 (免費)', desc: '享用當地新鮮海產，必吃奶油烤魚。', searchQuery: '浜の家海鮮食堂 恩納村' },
+    { day: 'D1', title: 'グランディオーソ沖縄プールヴィラ恩納 7D (11-12 Nov)', isHotel: true, color: '#ef4444', travelTime: '約 20分鐘', parking: '住宿附設停車位', desc: '〒904-0402 沖縄県国頭郡恩納村安富祖1854-7。辦理登記入住，兄弟們的秘密基地！', searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
+    { day: 'D1', title: '恩納村海灘水上活動', isHotel: false, color: '#3b82f6', travelTime: '約 5分鐘', parking: '海灘公共停車場', desc: '沙灘排球或水上活動，盡情放電。', searchQuery: '恩納村 海灘' },
+    { day: 'D1', title: '琉球之牛 (恩納店) 晚餐', isHotel: false, color: '#3b82f6', travelTime: '約 10分鐘', parking: '餐廳專屬/附近收費停車場', desc: '頂級沖繩和牛燒肉，為第一日畫上完美句號。', searchQuery: '琉球之牛 恩納店' },
+
+    { day: 'D2', title: 'グランディオーソ沖縄プールヴィラ恩納 7D 出發', isHotel: true, color: '#10b981', travelTime: '起點', parking: '住宿附設停車位', desc: '早上集合出發。', searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
+    { day: 'D2', title: '青之洞窟 (真榮田岬) 浮潛', isHotel: false, color: '#10b981', travelTime: '約 20分鐘', parking: '真榮田岬收費停車場', desc: '探索神秘的藍洞，欣賞豐富海洋生態。', searchQuery: '真榮田岬 青之洞窟' },
+    { day: 'D2', title: '恩納村阿古豬涮涮鍋 午餐', isHotel: false, color: '#10b981', travelTime: '約 10分鐘', parking: '餐廳提供', desc: '品嚐鮮甜美味的阿古豬涮涮鍋，補充體力。', searchQuery: '恩納村 阿古豬' },
+    { day: 'D2', title: 'Yambaru ATV 四輪越野車', isHotel: false, color: '#10b981', travelTime: '約 40分鐘', parking: '活動場地免費停車', desc: '穿越叢林，體驗刺激的四輪越野車！', searchQuery: 'Yambaru ATV 沖繩' },
+    { day: 'D2', title: '別墅 BBQ 晚餐', isHotel: false, color: '#10b981', travelTime: '約 30分鐘', parking: '別墅停車', desc: '兄弟在別墅享用 BBQ 晚餐，痛快暢飲。', searchQuery: '恩納村 BBQ' },
+
+    { day: 'D3', title: 'グランディオーソ沖縄プールヴィラ恩納 7D 退房出發', isHotel: true, color: '#8b5cf6', travelTime: '起點', parking: '住宿附設停車位', desc: '收拾行李，告別恩納村基地。', searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
+    { day: 'D3', title: '本部町 午餐 (燒肉/海邦丸)', isHotel: false, color: '#8b5cf6', travelTime: '約 40分鐘', parking: '周邊停車場', desc: '燒肉本部牧場或海邦丸海鮮丼，為婚禮前夕補充能量。', searchQuery: '海邦丸 本部町' },
+    { day: 'D3', title: 'Hotel Mahaina 登記入住', isHotel: true, color: '#8b5cf6', travelTime: '約 10分鐘', parking: '酒店停車場 (免費/住客專屬)', desc: '入住渡假村，換上戰衣準備出席婚禮！', searchQuery: 'Hotel Mahaina Wellness Resort Okinawa' },
+    { day: 'D3', title: '婚禮專車接送與晚宴狂歡 💍', isHotel: false, color: '#8b5cf6', travelTime: '專車接送', parking: '不適用', desc: '見證兄弟人生大事！狂歡慶祝不醉無歸。', searchQuery: 'Okinawa Wedding' },
+
+    { day: 'D4', title: 'Hotel Mahaina 退房出發', isHotel: true, color: '#f97316', travelTime: '起點', parking: '酒店停車場', desc: '帶著宿醉(可能)退房，向南部進發。', searchQuery: 'Hotel Mahaina Wellness Resort Okinawa' },
+    { day: 'D4', title: '美濱美國村', isHotel: false, color: '#f97316', travelTime: '約 1小時 10分', parking: '美國村大型免費停車場', desc: '異國風情街區，打卡買潮物。', searchQuery: '美國村 沖繩' },
+    { day: 'D4', title: 'AEON Mall Okinawa Rycom', isHotel: false, color: '#f97316', travelTime: '約 15分鐘', parking: '商場巨型免費停車場', desc: '沖繩最大型購物中心，瘋狂Shopping。', searchQuery: 'AEON Mall Okinawa Rycom' },
+    { day: 'D4', title: 'INFINISIS NAHA SHURIJO by 休伊特度假村 (14 Nov)', isHotel: true, color: '#f97316', travelTime: '約 40分鐘', parking: '附近收費停車場', desc: '40 Matsugawa, Naha 902-0062。登記入住那霸市區新酒店。', searchQuery: 'INFINISIS NAHA SHURIJO 休伊特度假村' },
+    { day: 'D4', title: '國際通購物', isHotel: false, color: '#f97316', travelTime: '步行', parking: '不適用', desc: '最後衝刺買手信。', searchQuery: '國際通 沖繩' },
+    { day: 'D4', title: '國際通屋台村 晚餐 🏮', isHotel: false, color: '#f97316', travelTime: '步行', parking: '不適用', desc: '體驗日本屋台文化，串燒啤酒傾計。', searchQuery: '國際通屋台村' },
+
+    { day: 'D5', title: 'INFINISIS NAHA SHURIJO 退房出發', isHotel: true, color: '#ec4899', travelTime: '起點', parking: '收費停車場', desc: '最後一日行程開始。', searchQuery: 'INFINISIS NAHA SHURIJO 休伊特度假村' },
+    { day: 'D5', title: '瀨長島 Umikaji Terrace', isHotel: false, color: '#ec4899', travelTime: '約 20分鐘', parking: '瀨長島免費停車場 (容易爆滿)', desc: '希臘風情純白建築，看飛機升降兼食幸福Pancake。', searchQuery: '瀨長島 Umikaji Terrace' },
+    { day: 'D5', title: '琉球新麵通堂 (小祿本店)', isHotel: false, color: '#ec4899', travelTime: '約 15分鐘', parking: '餐廳附設停車場', desc: '必試男人麵/女人麵，完美拉麵結尾。', searchQuery: '琉球新麵通堂 小祿本店' },
+    { day: 'D5', title: 'ASHIBINAA Outlet', isHotel: false, color: '#ec4899', travelTime: '約 10分鐘', parking: 'Outlet 免費停車場', desc: '臨上機前最後血拼。', searchQuery: 'ASHIBINAA Outlet 沖繩' },
+    { day: 'D5', title: '那霸機場還車返港 ✈️', isHotel: false, color: '#ec4899', travelTime: '約 15分鐘', parking: '租車公司還車點', desc: '還車，搭乘航班平安返回香港，兄弟旅行圓滿結束！', searchQuery: '那霸機場 租車' }
+];
+
+const dayTitles = {
+    D1: 'Day 1 (那霸 / 恩納村)',
+    D2: 'Day 2 (青之洞窟 / ATV)',
+    D3: 'Day 3 (本部町 / 婚禮)',
+    D4: 'Day 4 (美國村 / 國際通)',
+    D5: 'Day 5 (瀨長島 / 返港)'
+};
+
+let currentTab = 'ALL';
+let accData = { rate: 0.052, expenses: [], auditLogs: [], updatedAt: 0 };
+let selectedPayer = 'Wing';
+let selectedSplitUsers = [...accMembers]; // 預設全部
+let selectedFilterUser = '全部';
+let syncState = 'local'; // local | synced | offline
+let tempEditPayer = 'Wing';
+let tempEditSplitUsers = [...accMembers];
+
+function escapeHtml(str) {
+    return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function genId() {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+    return 'e_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+}
+
+function nowTs() { return Date.now(); }
+
+function normalizeExpense(ex) {
+    if (!ex || typeof ex !== 'object') return null;
+    let splitUsers;
+    if (Array.isArray(ex.splitUsers) && ex.splitUsers.length) {
+        splitUsers = ex.splitUsers.filter(u => accMembers.includes(u));
+    } else if (ex.splitUser === '全部' || !ex.splitUser) {
+        splitUsers = [...accMembers];
+    } else if (accMembers.includes(ex.splitUser)) {
+        splitUsers = [ex.splitUser];
+    } else {
+        splitUsers = [...accMembers];
+    }
+    if (!splitUsers.length) splitUsers = [...accMembers];
+    return {
+        id: ex.id || genId(),
+        desc: String(ex.desc || ''),
+        payer: accMembers.includes(ex.payer) ? ex.payer : accMembers[0],
+        splitUsers,
+        currency: ex.currency === 'HKD' ? 'HKD' : 'JPY',
+        amount: Number(ex.amount) || 0,
+        updatedAt: typeof ex.updatedAt === 'number' ? ex.updatedAt : nowTs()
+    };
+}
+
+function migrateAccData(raw) {
+    const data = raw && typeof raw === 'object' ? raw : {};
+    const expenses = Array.isArray(data.expenses) ? data.expenses.map(normalizeExpense).filter(Boolean) : [];
+    return {
+        rate: typeof data.rate === 'number' && data.rate > 0 ? data.rate : 0.052,
+        expenses,
+        auditLogs: Array.isArray(data.auditLogs) ? data.auditLogs : [],
+        updatedAt: typeof data.updatedAt === 'number' ? data.updatedAt : 0
+    };
+}
+
+function mergeExpenses(localList, cloudList) {
+    const map = new Map();
+    [...(localList || []), ...(cloudList || [])].forEach(ex => {
+        const n = normalizeExpense(ex);
+        if (!n) return;
+        const prev = map.get(n.id);
+        if (!prev || (n.updatedAt || 0) >= (prev.updatedAt || 0)) map.set(n.id, n);
+    });
+    return Array.from(map.values()).sort((a, b) => (a.updatedAt || 0) - (b.updatedAt || 0));
+}
+
+function mergeAccData(local, cloud) {
+    const L = migrateAccData(local);
+    const C = migrateAccData(cloud);
+    return {
+        rate: (C.updatedAt || 0) >= (L.updatedAt || 0) ? C.rate : L.rate,
+        expenses: mergeExpenses(L.expenses, C.expenses),
+        auditLogs: mergeAudit(L.auditLogs, C.auditLogs),
+        updatedAt: Math.max(L.updatedAt || 0, C.updatedAt || 0, nowTs())
+    };
+}
+
+function mergeAudit(a, b) {
+    const key = x => (x.timestamp || '') + '|' + (x.action || '') + '|' + (x.details || '');
+    const map = new Map();
+    [...(a || []), ...(b || [])].forEach(x => { if (x) map.set(key(x), x); });
+    return Array.from(map.values()).slice(0, 200);
+}
+
+function setSyncStatus(state) {
+    syncState = state;
+    const el = document.getElementById('sync-status');
+    if (!el) return;
+    if (!CLOUDFLARE_API_URL) {
+        el.classList.add('hidden');
+        el.textContent = '本地';
+        return;
+    }
+    el.classList.remove('hidden');
+    if (state === 'synced') { el.textContent = '雲端已同步'; el.className = 'text-[10px] bg-emerald-600 px-2 py-1 rounded-full shrink-0'; }
+    else if (state === 'offline') { el.textContent = '離線'; el.className = 'text-[10px] bg-amber-600 px-2 py-1 rounded-full shrink-0'; }
+    else if (state === 'syncing') { el.textContent = '同步中…'; el.className = 'text-[10px] bg-blue-700 px-2 py-1 rounded-full shrink-0'; }
+    else { el.textContent = '本地'; el.className = 'text-[10px] bg-blue-800/80 px-2 py-1 rounded-full shrink-0'; }
+}
+
+function showConfirm(msg, callback, yesText = '確認', noText = '取消', isAlert = false) {
+    document.getElementById('confirm-msg').innerText = msg;
+    document.getElementById('confirm-yes-btn').innerText = yesText;
+    document.getElementById('confirm-yes-btn').onclick = () => {
+        closeConfirmModal();
+        if (callback) callback();
+    };
+    const noBtn = document.getElementById('confirm-no-btn');
+    if (isAlert) {
+        noBtn.style.display = 'none';
+    } else {
+        noBtn.style.display = 'block';
+        noBtn.innerText = noText;
+    }
+    document.getElementById('confirm-modal').style.display = 'flex';
+}
+function closeConfirmModal() {
+    document.getElementById('confirm-modal').style.display = 'none';
+}
+
+async function softHash(str) {
+    const enc = new TextEncoder().encode('okinawa-audit:' + str);
+    if (crypto && crypto.subtle) {
+        const buf = await crypto.subtle.digest('SHA-256', enc);
+        return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    // fallback：極弱 hash（仍只係阻嚇）
+    let h = 0;
+    for (let i = 0; i < str.length; i++) h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+    return 'fallback_' + Math.abs(h).toString(16);
+}
+
+async function expectedPassHash() {
+    return AUDIT_PASS_HASH;
+}
+
+async function loadAccData() {
+    // local first
+    let localRaw = localStorage.getItem(STORAGE_KEY);
+    if (!localRaw) {
+        const legacy = localStorage.getItem(STORAGE_KEY_LEGACY);
+        if (legacy) {
+            try {
+                accData = migrateAccData(JSON.parse(legacy));
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(accData));
+            } catch (e) {
+                accData = migrateAccData(null);
+            }
+        } else {
+            accData = migrateAccData(null);
+        }
+    } else {
+        try { accData = migrateAccData(JSON.parse(localRaw)); }
+        catch (e) { accData = migrateAccData(null); }
+    }
+
+    if (!CLOUDFLARE_API_URL) {
+        setSyncStatus('local');
+        return;
+    }
+
+    setSyncStatus('syncing');
+    try {
+        const response = await fetch(CLOUDFLARE_API_URL);
+        if (response.ok) {
+            const cloudData = await response.json();
+            accData = mergeAccData(accData, cloudData);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(accData));
+            setSyncStatus('synced');
+        } else {
+            setSyncStatus('offline');
+        }
+    } catch (e) {
+        console.warn('Cloudflare fetch failed', e);
+        setSyncStatus('offline');
+    }
+}
+
+async function saveAccData(logAction, logDetails, opts = {}) {
+    if (!Array.isArray(accData.auditLogs)) accData.auditLogs = [];
+    if (logAction) {
+        accData.auditLogs.unshift({
+            timestamp: new Date().toLocaleString('zh-HK', { timeZone: 'Asia/Hong_Kong' }),
+            action: logAction,
+            details: logDetails
+        });
+        if (accData.auditLogs.length > 200) accData.auditLogs.length = 200;
+    }
+    accData.updatedAt = nowTs();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(accData));
+
+    if (CLOUDFLARE_API_URL) {
+        setSyncStatus('syncing');
+        try {
+            // pull-merge-push to reduce overwrite risk
+            let cloud = null;
+            try {
+                const r = await fetch(CLOUDFLARE_API_URL);
+                if (r.ok) cloud = await r.json();
+            } catch (_) {}
+            if (cloud) accData = mergeAccData(accData, cloud);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(accData));
+            await fetch(CLOUDFLARE_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(accData)
+            });
+            setSyncStatus('synced');
+        } catch (e) {
+            console.error('Failed to sync', e);
+            setSyncStatus('offline');
+        }
+    } else {
+        setSyncStatus('local');
+    }
+
+    if (!opts.skipRender && currentTab === 'ACCOUNTING') renderAccounting();
+}
+
+function getGoogleMapsLink(searchQuery) {
+    return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(searchQuery);
+}
+
+function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.nav-tab').forEach(el => {
+        el.className = 'nav-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-full font-semibold mr-2 transition-colors cursor-pointer';
+    });
+    const topAccBtn = document.getElementById('top-acc-btn');
+    if (tab === 'ACCOUNTING') {
+        topAccBtn.classList.remove('bg-yellow-400', 'hover:bg-yellow-500', 'text-blue-900');
+        topAccBtn.classList.add('bg-indigo-600', 'text-white', 'ring-2', 'ring-offset-2', 'ring-indigo-600');
+    } else {
+        topAccBtn.classList.add('bg-yellow-400', 'hover:bg-yellow-500', 'text-blue-900');
+        topAccBtn.classList.remove('bg-indigo-600', 'text-white', 'ring-2', 'ring-offset-2', 'ring-indigo-600');
+        const activeBtn = document.querySelector('.nav-tab[data-tab="' + tab + '"]');
+        if (activeBtn) {
+            activeBtn.className = 'nav-tab active-tab bg-blue-100 text-blue-700 px-4 py-2 rounded-full font-bold mr-2 transition-colors cursor-pointer ring-1 ring-blue-300';
+        }
+    }
+    renderContent(tab);
+}
+
+function requestOpenAudit() {
+    document.getElementById('pwd-input').value = '';
+    document.getElementById('pwd-error').classList.add('hidden');
+    document.getElementById('pwd-modal').style.display = 'flex';
+    setTimeout(() => document.getElementById('pwd-input').focus(), 100);
+}
+function closePwdModal() { document.getElementById('pwd-modal').style.display = 'none'; }
+
+async function submitPassphrase() {
+    const pwd = document.getElementById('pwd-input').value;
+    const got = await softHash(pwd);
+    const expect = await expectedPassHash();
+    if (got === expect) {
+        closePwdModal();
+        executeOpenAudit();
+    } else {
+        document.getElementById('pwd-error').classList.remove('hidden');
+        document.getElementById('pwd-input').value = '';
+        document.getElementById('pwd-input').focus();
+    }
+}
+
+function executeOpenAudit() {
+    const listEl = document.getElementById('audit-logs-list');
+    listEl.innerHTML = (accData.auditLogs || []).map(log => `
+        <div class="border-b border-gray-200 pb-2 mb-2">
+            <div class="text-gray-400 mb-1 text-[10px]"><i class="fa-regular fa-clock mr-1"></i>${escapeHtml(log.timestamp)}</div>
+            <strong class="text-indigo-600 bg-indigo-50 px-1 rounded">${escapeHtml(log.action)}</strong>
+            <span class="text-gray-800 font-bold ml-1">${escapeHtml(log.details)}</span>
+        </div>
+    `).join('') || '<div class="text-gray-400 text-center py-4">尚無足跡</div>';
+    document.getElementById('audit-modal').style.display = 'flex';
+}
+function closeAuditModal() { document.getElementById('audit-modal').style.display = 'none'; }
+
+function renderContent(tab) {
+    const sidebar = document.getElementById('sidebar-content');
+    sidebar.innerHTML = '';
+
+    if (tab === 'ACCOUNTING') { renderAccounting(); return; }
+
+    if (tab === 'MANUAL') {
+        sidebar.innerHTML = `
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 w-full mb-12">
+                <h2 class="text-2xl font-bold mb-4 text-blue-800"><i class="fa-solid fa-book-open mr-2"></i>行車及求生手冊</h2>
+                <div class="space-y-4">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h3 class="font-bold text-blue-900 mb-2"><i class="fa-solid fa-car-side mr-2"></i>自駕注意事項</h3>
+                        <ul class="list-disc pl-5 text-sm text-gray-700 space-y-2">
+                            <li><b>靠左行駛</b>：日本為右駕左行，時刻提醒司機「左邊、左邊」。轉彎口訣「左轉轉小彎，右轉轉大彎」。</li>
+                            <li><b>「止まれ」(TOMARE) 標誌</b>：遇到紅色倒三角形標誌，必須<b>完全停車 3 秒</b>，確認左右無車後才可駛出。警察最常捉！</li>
+                            <li><b>入油與還車</b>：還車前必須加滿油，保留最後一張入油收據。通常入 Regular (紅槍)。</li>
+                            <li><b>泊車</b>：切勿違例泊車，罰款極高。請使用收費停車場。</li>
+                        </ul>
+                    </div>
+                    <div class="bg-amber-50 p-4 rounded-lg">
+                        <h3 class="font-bold text-amber-900 mb-2"><i class="fa-solid fa-road mr-2"></i>高速公路／ETC</h3>
+                        <ul class="list-disc pl-5 text-sm text-gray-700 space-y-2">
+                            <li>沖繩有限速公路／收費路段；租車時可問櫃台有冇 <b>ETC 卡</b>，過閘唔使停車。</li>
+                            <li>冇 ETC 就行現金／信用卡閘口；保留收據方便之後記帳。</li>
+                            <li>長途（恩納 ↔ 那霸／機場）可考慮上快速道路慳時間，費用可記入「高速公路費」。</li>
+                        </ul>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg">
+                        <h3 class="font-bold text-red-900 mb-2"><i class="fa-solid fa-phone mr-2"></i>緊急電話</h3>
+                        <ul class="list-disc pl-5 text-sm text-gray-700 space-y-2">
+                            <li><b>110</b>：警察</li>
+                            <li><b>119</b>：消防／救護</li>
+                            <li>酒店前台／租車公司緊急聯絡：入住／拎車時影低名片或 WhatsApp。</li>
+                        </ul>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <h3 class="font-bold text-purple-900 mb-2"><i class="fa-solid fa-ring mr-2"></i>婚禮準備清單</h3>
+                        <ul class="list-disc pl-5 text-sm text-gray-700 space-y-2">
+                            <li><b>戰衣準備</b>：西裝 / 禮服、領帶、皮鞋及<b>深色襪子</b>。</li>
+                            <li><b>狂歡必備</b>：解酒藥 (薑黃之力等，便利店有售)。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>`;
+        return;
+    }
+
+    if (tab === 'ALL') {
+        let allHtml = '<div class="w-full space-y-6 pb-12">';
+        ['D1','D2','D3','D4','D5'].forEach(d => {
+            const dayPoints = itineraryData.filter(pt => pt.day === d);
+            allHtml += `
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                    <h3 class="font-bold text-lg text-blue-900 mb-3 border-b pb-2 flex items-center">
+                        <span class="bg-blue-100 text-blue-700 text-xs px-2.5 py-1 rounded-full mr-2">${d}</span>
+                        ${escapeHtml(dayTitles[d])}
+                    </h3>
+                    <ul class="space-y-3 text-sm">`;
+            dayPoints.forEach(pt => {
+                const mapsLink = getGoogleMapsLink(pt.searchQuery);
+                allHtml += `
+                    <li class="flex flex-col border-b border-gray-50 pb-3 gap-1">
+                        <div class="font-semibold text-gray-800 text-base">${pt.isHotel ? '🏠 ' : ''}${escapeHtml(pt.title)}</div>
+                        <div class="text-xs text-gray-500 mb-1">${escapeHtml(pt.desc)}</div>
+                        <a href="${mapsLink}" target="_blank" rel="noopener noreferrer" class="self-start inline-flex bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-medium items-center transition-colors">
+                            <i class="fa-solid fa-location-arrow mr-1"></i> Google 地圖搜尋
+                        </a>
+                    </li>`;
+            });
+            allHtml += '</ul></div>';
+        });
+        allHtml += '</div>';
+        sidebar.innerHTML = allHtml;
+        return;
+    }
+
+    const points = itineraryData.filter(d => d.day === tab);
+    let seqCount = 1;
+    let dayHtml = '<div class="w-full pb-12 space-y-4">';
+    points.forEach(pt => {
+        let iconHtml = pt.isHotel ? '🏠' : String(seqCount);
+        if (!pt.isHotel) seqCount++;
+        const mapsLink = getGoogleMapsLink(pt.searchQuery);
+        dayHtml += `
+            <div class="timeline-item">
+                <div class="timeline-icon ${pt.isHotel ? 'timeline-hotel-icon' : ''}" style="${!pt.isHotel ? 'background-color:' + pt.color : ''}">
+                    ${iconHtml}
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-lg text-gray-800 mb-1">${escapeHtml(pt.title)}</h3>
+                    <p class="text-sm text-gray-600 mb-3">${escapeHtml(pt.desc)}</p>
+                    <div class="grid grid-cols-2 gap-2 text-xs text-gray-500 mb-3 bg-gray-50 p-2 rounded-lg">
+                        <div><i class="fa-solid fa-clock mr-1"></i> 行車: ${escapeHtml(pt.travelTime)}</div>
+                        <div><i class="fa-solid fa-square-parking mr-1"></i> 泊車: ${escapeHtml(pt.parking)}</div>
+                    </div>
+                    <a href="${mapsLink}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-full bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium py-2 px-4 rounded-lg transition-colors text-sm cursor-pointer">
+                        <i class="fa-solid fa-location-arrow mr-2"></i> Google 地圖搜尋
+                    </a>
+                </div>
+            </div>`;
+    });
+    dayHtml += '</div>';
+    sidebar.innerHTML = dayHtml;
+}
+
+function toHKD(ex) {
+    return ex.currency === 'JPY' ? ex.amount * accData.rate : ex.amount;
+}
+
+function formatSplitLabel(splitUsers) {
+    if (!splitUsers || splitUsers.length === accMembers.length) return '全部人';
+    return splitUsers.join('、');
+}
+
+function expenseMatchesFilter(ex) {
+    if (selectedFilterUser === '全部') return true;
+    if (ex.payer === selectedFilterUser) return true;
+    return (ex.splitUsers || []).includes(selectedFilterUser);
+}
+
+function computeSettlement() {
+    const balances = Object.fromEntries(accMembers.map(m => [m, 0]));
+    const paid = Object.fromEntries(accMembers.map(m => [m, 0]));
+    const consumed = Object.fromEntries(accMembers.map(m => [m, 0]));
+    let totalHKD = 0;
+
+    accData.expenses.forEach(ex => {
+        const hkd = toHKD(ex);
+        totalHKD += hkd;
+        paid[ex.payer] += hkd;
+        balances[ex.payer] += hkd;
+        const users = (ex.splitUsers && ex.splitUsers.length) ? ex.splitUsers : accMembers;
+        const share = hkd / users.length;
+        users.forEach(m => {
+            if (consumed[m] == null) return;
+            consumed[m] += share;
+            balances[m] -= share;
+        });
+    });
+
+    const debtors = [];
+    const creditors = [];
+    accMembers.forEach(m => {
+        const bal = balances[m];
+        if (bal < -0.01) debtors.push({ name: m, amount: -bal });
+        else if (bal > 0.01) creditors.push({ name: m, amount: bal });
+    });
+    debtors.sort((a, b) => b.amount - a.amount);
+    creditors.sort((a, b) => b.amount - a.amount);
+
+    const transfers = [];
+    let i = 0, j = 0;
+    while (i < debtors.length && j < creditors.length) {
+        const amt = Math.min(debtors[i].amount, creditors[j].amount);
+        transfers.push({ from: debtors[i].name, to: creditors[j].name, amount: amt });
+        debtors[i].amount -= amt;
+        creditors[j].amount -= amt;
+        if (debtors[i].amount < 0.01) i++;
+        if (creditors[j].amount < 0.01) j++;
+    }
+    return { balances, paid, consumed, totalHKD, transfers };
+}
+
+function updatePayerChipStyles() {
+    document.querySelectorAll('[data-payer-chip]').forEach(btn => {
+        const on = btn.getAttribute('data-payer-chip') === selectedPayer;
+        btn.className = 'flex-1 min-w-[60px] py-2 px-1 text-sm font-bold rounded border-2 transition-colors cursor-pointer ' + (on ? 'chip-on-green' : 'chip-off-green');
+    });
+}
+
+function updateSplitChipStyles() {
+    const allOn = selectedSplitUsers.length === accMembers.length;
+    const allBtn = document.getElementById('split-all-btn');
+    if (allBtn) {
+        allBtn.className = 'w-full py-2.5 px-2 text-sm font-bold rounded border-2 transition-colors cursor-pointer ' + (allOn ? 'chip-on-red' : 'chip-off-red');
+    }
+    document.querySelectorAll('[data-split-chip]').forEach(btn => {
+        const name = btn.getAttribute('data-split-chip');
+        const on = selectedSplitUsers.includes(name);
+        btn.className = 'flex-1 min-w-[60px] py-2 px-1 text-sm font-bold rounded border-2 transition-colors cursor-pointer ' + (on ? 'chip-on-red' : 'chip-off-red');
+    });
+}
+
+function selectPayer(name) {
+    selectedPayer = name;
+    updatePayerChipStyles();
+}
+
+function toggleSplitUser(user) {
+    if (user === '全部') {
+        selectedSplitUsers = [...accMembers];
+    } else {
+        if (selectedSplitUsers.length === accMembers.length) {
+            // 由「全部」轉為只揀呢個
+            selectedSplitUsers = [user];
+        } else if (selectedSplitUsers.includes(user)) {
+            selectedSplitUsers = selectedSplitUsers.filter(u => u !== user);
+            if (!selectedSplitUsers.length) selectedSplitUsers = [user]; // 至少一人
+        } else {
+            selectedSplitUsers = [...selectedSplitUsers, user];
+            if (selectedSplitUsers.length === accMembers.length) {
+                // already all
+            }
+        }
+    }
+    updateSplitChipStyles();
+}
+
+function setFilterUser(user) {
+    selectedFilterUser = user;
+    renderAccounting();
+}
+
+function setPresetDesc(preset) {
+    const descEl = document.getElementById('acc-desc');
+    if (descEl) descEl.value = preset;
+}
+
+function saveRateFromInput() {
+    const el = document.getElementById('acc-rate');
+    if (!el) return;
+    const v = parseFloat(el.value);
+    if (isNaN(v) || v <= 0) {
+        showConfirm('請輸入有效匯率（例如 0.052）', null, '知道', '', true);
+        el.value = accData.rate;
+        return;
+    }
+    accData.rate = v;
+    saveAccData('更新匯率', 'JPY→HKD = ' + v);
+}
+
+function renderAccounting() {
+    const sidebar = document.getElementById('sidebar-content');
+    const { balances, paid, consumed, totalHKD, transfers } = computeSettlement();
+
+    const filtered = accData.expenses.filter(expenseMatchesFilter).slice().reverse();
+
+    const expensesHtml = filtered.map(ex => `
+        <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-gray-100 mb-2">
+            <div class="flex-1 min-w-0 pr-2">
+                <div class="font-bold text-gray-800 truncate">${escapeHtml(ex.desc)}</div>
+                <div class="text-xs mt-1 flex flex-wrap gap-1 items-center">
+                    <span class="text-green-700 font-bold bg-green-50 px-1 rounded border border-green-200">墊: ${escapeHtml(ex.payer)}</span>
+                    <i class="fa-solid fa-arrow-right mx-0.5 text-gray-400"></i>
+                    <span class="text-red-700 font-bold bg-red-50 px-1 rounded border border-red-200">用: ${escapeHtml(formatSplitLabel(ex.splitUsers))}</span>
+                </div>
+            </div>
+            <div class="text-right mr-2 shrink-0">
+                <div class="font-bold text-indigo-600">${escapeHtml(ex.currency)} ${Number(ex.amount).toLocaleString()}</div>
+                ${ex.currency === 'JPY' ? `<div class="text-xs text-gray-400">≈ HKD ${(ex.amount * accData.rate).toFixed(1)}</div>` : ''}
+            </div>
+            <div class="flex flex-col gap-2 shrink-0">
+                <button type="button" onclick="openEditModal('${escapeHtml(ex.id)}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded cursor-pointer" title="修改"><i class="fa-solid fa-pen"></i></button>
+                <button type="button" onclick="requestDelete('${escapeHtml(ex.id)}')" class="text-red-500 hover:text-red-700 bg-red-50 p-1.5 rounded cursor-pointer" title="刪除"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        </div>
+    `).join('') || '<div class="text-center text-gray-400 py-4">暫無支出紀錄</div>';
+
+    const allSplitOn = selectedSplitUsers.length === accMembers.length;
+
+    sidebar.innerHTML = `
+        <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 w-full mb-12">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h2 class="text-2xl font-bold text-indigo-800"><i class="fa-solid fa-wallet mr-2"></i>兄弟記帳本</h2>
+                <button type="button" onclick="requestOpenAudit()" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold py-1.5 px-3 rounded-lg text-xs shadow flex items-center cursor-pointer">
+                    <i class="fa-solid fa-shield-halved mr-1.5"></i> Log
                 </button>
             </div>
-            <div class="tabs-container bg-white border-b border-gray-200 px-2 py-2">
-                <button onclick="switchTab('ALL')" class="nav-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-full font-semibold mr-2 transition-colors cursor-pointer">全部</button>
-                <button onclick="switchTab('D1')" class="nav-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-full font-semibold mr-2 transition-colors cursor-pointer">D1</button>
-                <button onclick="switchTab('D2')" class="nav-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-full font-semibold mr-2 transition-colors cursor-pointer">D2</button>
-                <button onclick="switchTab('D3')" class="nav-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-full font-semibold mr-2 transition-colors cursor-pointer">D3💍</button>
-                <button onclick="switchTab('D4')" class="nav-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-full font-semibold mr-2 transition-colors cursor-pointer">D4🏮</button>
-                <button onclick="switchTab('D5')" class="nav-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-full font-semibold mr-2 transition-colors cursor-pointer">D5✈️</button>
-                <button onclick="switchTab('MANUAL')" class="nav-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-full font-semibold transition-colors cursor-pointer">手冊</button>
-            </div>
-        </header>
 
-        <!-- Content Area -->
-        <div class="content-wrapper">
-            <div class="scroll-section max-w-2xl mx-auto w-full" id="sidebar-content">
-                <!-- Content populated dynamically -->
-            </div>
-        </div>
-    </div>
-
-    <!-- 自訂彈窗 Confirm Modal -->
-    <div id="confirm-modal" style="display: none;" class="fixed inset-0 bg-slate-900/60 z-[70] flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full text-center">
-            <h3 class="text-lg font-bold text-gray-800 mb-6" id="confirm-msg"></h3>
-            <div class="flex gap-3">
-                <button id="confirm-no-btn" onclick="closeConfirmModal()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 rounded-lg cursor-pointer">取消</button>
-                <button id="confirm-yes-btn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg cursor-pointer shadow-md">確認</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 密碼驗證 Modal (for Log) -->
-    <div id="pwd-modal" style="display: none;" class="fixed inset-0 bg-slate-900/60 z-[60] flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full">
-            <h3 class="text-lg font-bold text-gray-800 mb-2"><i class="fa-solid fa-lock mr-2 text-red-600"></i>安全驗證</h3>
-            <p class="text-sm text-gray-600 mb-4">請輸入管理員密碼以查看 Log：</p>
-            <input type="password" id="pwd-input" onkeydown="if(event.key === 'Enter') submitPassword()" class="w-full p-3 border-2 border-gray-300 rounded mb-2 focus:border-indigo-500 focus:outline-none font-mono text-center tracking-[0.5em] text-lg">
-            <p id="pwd-error" class="text-red-500 text-xs font-bold mb-4 hidden">密碼錯誤，請重試！</p>
-            <div class="flex gap-2">
-                <button onclick="closePwdModal()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 rounded-lg cursor-pointer">取消</button>
-                <button onclick="submitPassword()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg cursor-pointer">確認</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Expense Modal -->
-    <div id="edit-modal" style="display: none;" class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <h3 class="text-xl font-bold text-gray-800 mb-4"><i class="fa-solid fa-pen-to-square mr-2 text-indigo-600"></i>修改支出紀錄</h3>
-            <input type="hidden" id="edit-index">
-            <div class="space-y-4 mb-4">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">項目名稱：</label>
-                    <input type="text" id="edit-desc" class="p-2 border-2 border-gray-300 rounded w-full bg-white focus:outline-none focus:border-indigo-500 text-base">
+            <div class="bg-slate-50 p-3 rounded-lg mb-4 border border-slate-200 flex flex-wrap items-end gap-3">
+                <div class="flex-1 min-w-[140px]">
+                    <label class="block text-xs font-bold text-slate-600 mb-1">匯率（1 JPY ≈ ? HKD）</label>
+                    <input type="number" id="acc-rate" inputmode="decimal" step="any" value="${accData.rate}" class="w-full p-2 border-2 border-gray-300 rounded font-bold focus:border-indigo-500 focus:outline-none bg-white">
                 </div>
-                <div class="bg-green-50 p-2 rounded border border-green-200">
-                    <label class="block text-xs font-semibold text-green-800 mb-1">墊支者：</label>
-                    <div id="edit-payer-buttons"></div>
-                </div>
-                <div class="bg-red-50 p-2 rounded border border-red-200">
-                    <label class="block text-xs font-semibold text-red-800 mb-2">使用者 (分攤對象)：</label>
-                    <div id="edit-split-buttons"></div>
-                </div>
-                <div class="flex gap-2">
-                    <select id="edit-currency" class="p-2 border-2 border-gray-300 rounded w-1/3 bg-white focus:outline-none focus:border-indigo-500 text-base font-bold">
-                        <option value="JPY">JPY ¥</option>
-                        <option value="HKD">HKD $</option>
-                    </select>
-                    <input type="number" id="edit-amount" class="p-2 border-2 border-gray-300 rounded w-2/3 bg-white focus:outline-none focus:border-indigo-500 text-lg font-bold">
-                </div>
+                <button type="button" onclick="saveRateFromInput()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-lg text-sm cursor-pointer">儲存匯率</button>
             </div>
-            <div class="flex gap-2 mt-4 border-t pt-4">
-                <button onclick="closeEditModal()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 rounded-lg cursor-pointer">取消</button>
-                <button onclick="confirmSaveEditedExpense()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg cursor-pointer shadow-lg">儲存修改</button>
-            </div>
-        </div>
-    </div>
 
-    <!-- Audit Log Modal -->
-    <div id="audit-modal" style="display: none;" class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-lg w-full h-[80vh] flex flex-col">
-            <h3 class="text-xl font-bold text-gray-800 mb-2"><i class="fa-solid fa-shield-halved mr-2 text-indigo-600"></i>Log</h3>
-            <p class="text-xs text-gray-500 mb-4">記錄所有支出紀錄新增、修改、刪除的歷史足跡。不可修改。</p>
-            <div id="audit-logs-list" class="flex-1 overflow-y-auto space-y-2 border p-3 rounded bg-gray-50 text-xs font-mono">
-                <!-- Audit entries -->
-            </div>
-            <div class="mt-4 pt-2 border-t flex justify-end shrink-0">
-                <button onclick="closeAuditModal()" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg cursor-pointer text-sm">關閉</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // 請在此處填入你的 Cloudflare 接口 URL (例如 Worker 端點)
-        const CLOUDFLARE_API_URL = ''; 
-
-        const itineraryData = [
-            { day: 'D1', title: '那霸機場拎車', isHotel: false, color: '#3b82f6', travelTime: '機場出發', parking: '機場周邊租車公司停車場', desc: '抵達沖繩，辦理租車手續，檢查車輛準備出發！', searchQuery: '那霸機場 租車' },
-            { day: 'D1', title: '殘波岬燈塔 & 壯麗斷崖', isHotel: false, color: '#3b82f6', travelTime: '約 1小時', parking: '免費停車場', desc: '欣賞壯觀的海岸線斷崖與白色燈塔。', searchQuery: '殘波岬燈塔 沖繩' },
-            { day: 'D1', title: '浜の家海鮮食堂 午餐', isHotel: false, color: '#3b82f6', travelTime: '約 15分鐘', parking: '餐廳專屬停車場 (免費)', desc: '享用當地新鮮海產，必吃奶油烤魚。', searchQuery: '浜の家海鮮食堂 恩納村' },
-            { day: 'D1', title: 'グランディオーソ沖縄プールヴィラ恩納 7D (11-12 Nov)', isHotel: true, color: '#ef4444', travelTime: '約 20分鐘', parking: '住宿附設停車位', desc: '〒904-0402 沖縄県国頭郡恩納村安富祖1854-7。辦理登記入住，兄弟們的秘密基地！', searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
-            { day: 'D1', title: '恩納村海灘水上活動', isHotel: false, color: '#3b82f6', travelTime: '約 5分鐘', parking: '海灘公共停車場', desc: '沙灘排球或水上活動，盡情放電。', searchQuery: '恩納村 海灘' },
-            { day: 'D1', title: '琉球之牛 (恩納店) 晚餐', isHotel: false, color: '#3b82f6', travelTime: '約 10分鐘', parking: '餐廳專屬/附近收費停車場', desc: '頂級沖繩和牛燒肉，為第一日畫上完美句號。', searchQuery: '琉球之牛 恩納店' },
-            
-            { day: 'D2', title: 'グランディオーソ沖縄プールヴィラ恩納 7D 出發', isHotel: true, color: '#10b981', travelTime: '起點', parking: '住宿附設停車位', desc: '早上集合出發。', searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
-            { day: 'D2', title: '青之洞窟 (真榮田岬) 浮潛', isHotel: false, color: '#10b981', travelTime: '約 20分鐘', parking: '真榮田岬收費停車場', desc: '探索神秘的藍洞，欣賞豐富海洋生態。', searchQuery: '真榮田岬 青之洞窟' },
-            { day: 'D2', title: '恩納村阿古豬涮涮鍋 午餐', isHotel: false, color: '#10b981', travelTime: '約 10分鐘', parking: '餐廳提供', desc: '品嚐鮮甜美味的阿古豬涮涮鍋，補充體力。', searchQuery: '恩納村 阿古豬' },
-            { day: 'D2', title: 'Yambaru ATV 四輪越野車', isHotel: false, color: '#10b981', travelTime: '約 40分鐘', parking: '活動場地免費停車', desc: '穿越叢林，體驗刺激的四輪越野車！', searchQuery: 'Yambaru ATV 沖繩' },
-            { day: 'D2', title: '別墅 BBQ 晚餐', isHotel: false, color: '#10b981', travelTime: '約 30分鐘', parking: '別墅停車', desc: '兄弟在別墅享用 BBQ 晚餐，痛快暢飲。', searchQuery: '恩納村 BBQ' },
-
-            { day: 'D3', title: 'グランディオーソ沖縄プールヴィラ恩納 7D 退房出發', isHotel: true, color: '#8b5cf6', travelTime: '起點', parking: '住宿附設停車位', desc: '收拾行李，告別恩納村基地。', searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
-            { day: 'D3', title: '本部町 午餐 (燒肉/海邦丸)', isHotel: false, color: '#8b5cf6', travelTime: '約 40分鐘', parking: '周邊停車場', desc: '燒肉本部牧場或海邦丸海鮮丼，為婚禮前夕補充能量。', searchQuery: '海邦丸 本部町' },
-            { day: 'D3', title: 'Hotel Mahaina 登記入住', isHotel: true, color: '#8b5cf6', travelTime: '約 10分鐘', parking: '酒店停車場 (免費/住客專屬)', desc: '入住渡假村，換上戰衣準備出席婚禮！', searchQuery: 'Hotel Mahaina Wellness Resort Okinawa' },
-            { day: 'D3', title: '婚禮專車接送與晚宴狂歡 💍', isHotel: false, color: '#8b5cf6', travelTime: '專車接送', parking: '不適用', desc: '見證兄弟人生大事！狂歡慶祝不醉無歸。', searchQuery: 'Okinawa Wedding' },
-
-            { day: 'D4', title: 'Hotel Mahaina 退房出發', isHotel: true, color: '#f97316', travelTime: '起點', parking: '酒店停車場', desc: '帶著宿醉(可能)退房，向南部進發。', searchQuery: 'Hotel Mahaina Wellness Resort Okinawa' },
-            { day: 'D4', title: '美濱美國村', isHotel: false, color: '#f97316', travelTime: '約 1小時 10分', parking: '美國村大型免費停車場', desc: '異國風情街區，打卡買潮物。', searchQuery: '美國村 沖繩' },
-            { day: 'D4', title: 'AEON Mall Okinawa Rycom', isHotel: false, color: '#f97316', travelTime: '約 15分鐘', parking: '商場巨型免費停車場', desc: '沖繩最大型購物中心，瘋狂Shopping。', searchQuery: 'AEON Mall Okinawa Rycom' },
-            { day: 'D4', title: 'INFINISIS NAHA SHURIJO by 休伊特度假村 (14 Nov)', isHotel: true, color: '#f97316', travelTime: '約 40分鐘', parking: '附近收費停車場', desc: '40 Matsugawa, Naha 902-0062。登記入住那霸市區新酒店。', searchQuery: 'INFINISIS NAHA SHURIJO 休伊特度假村' },
-            { day: 'D4', title: '國際通購物', isHotel: false, color: '#f97316', travelTime: '步行', parking: '不適用', desc: '最後衝刺買手信。', searchQuery: '國際通 沖繩' },
-            { day: 'D4', title: '國際通屋台村 晚餐 🏮', isHotel: false, color: '#f97316', travelTime: '步行', parking: '不適用', desc: '體驗日本屋台文化，串燒啤酒傾計。', searchQuery: '國際通屋台村' },
-
-            { day: 'D5', title: 'INFINISIS NAHA SHURIJO 退房出發', isHotel: true, color: '#ec4899', travelTime: '起點', parking: '收費停車場', desc: '最後一日行程開始。', searchQuery: 'INFINISIS NAHA SHURIJO 休伊特度假村' },
-            { day: 'D5', title: '瀨長島 Umikaji Terrace', isHotel: false, color: '#ec4899', travelTime: '約 20分鐘', parking: '瀨長島免費停車場 (容易爆滿)', desc: '希臘風情純白建築，看飛機升降兼食幸福Pancake。', searchQuery: '瀨長島 Umikaji Terrace' },
-            { day: 'D5', title: '琉球新麵通堂 (小祿本店)', isHotel: false, color: '#ec4899', travelTime: '約 15分鐘', parking: '餐廳附設停車場', desc: '必試男人麵/女人麵，完美拉麵結尾。', searchQuery: '琉球新麵通堂 小祿本店' },
-            { day: 'D5', title: 'ASHIBINAA Outlet', isHotel: false, color: '#ec4899', travelTime: '約 10分鐘', parking: 'Outlet 免費停車場', desc: '臨上機前最後血拼。', searchQuery: 'ASHIBINAA Outlet 沖繩' },
-            { day: 'D5', title: '那霸機場還車返港 ✈️', isHotel: false, color: '#ec4899', travelTime: '約 15分鐘', parking: '租車公司還車點', desc: '還車，搭乘航班平安返回香港，兄弟旅行圓滿結束！', searchQuery: '那霸機場 租車' }
-        ];
-
-        let currentTab = 'ALL'; 
-        let accData = { rate: 0.052, expenses: [], auditLogs: [] };
-        const accMembers = ['Wing', '天', 'Kenson', 'Michael'];
-        let selectedPayer = 'Wing';
-        let selectedSplitUser = '全部';
-        let selectedFilterUser = '全部';
-        const commonExpensePresets = ['早餐', '午餐', '晚餐', '油費', '高速公路費', '零食/飲品', '超市買嘢', '景點門票', '租車/活動', '其他'];
-
-        const STORAGE_KEY = 'greenwood_okinawa_acc_v13'; 
-
-        function showConfirm(msg, callback, yesText = '確認', noText = '取消', isAlert = false) {
-            document.getElementById('confirm-msg').innerText = msg;
-            document.getElementById('confirm-yes-btn').innerText = yesText;
-            document.getElementById('confirm-yes-btn').onclick = () => {
-                closeConfirmModal();
-                if (callback) callback();
-            };
-            
-            if (isAlert) {
-                document.getElementById('confirm-no-btn').style.display = 'none';
-            } else {
-                document.getElementById('confirm-no-btn').style.display = 'block';
-                document.getElementById('confirm-no-btn').innerText = noText;
-            }
-            document.getElementById('confirm-modal').style.display = 'flex';
-        }
-
-        function closeConfirmModal() {
-            document.getElementById('confirm-modal').style.display = 'none';
-        }
-
-        async function loadAccData() {
-            if (CLOUDFLARE_API_URL) {
-                try {
-                    const response = await fetch(CLOUDFLARE_API_URL);
-                    if (response.ok) {
-                        const cloudData = await response.json();
-                        if (cloudData && Array.isArray(cloudData.expenses)) {
-                            accData = cloudData;
-                            localStorage.setItem(STORAGE_KEY, JSON.stringify(accData));
-                            if(currentTab === 'ACCOUNTING') renderAccounting();
-                            return;
-                        }
-                    }
-                } catch(e) {
-                    console.warn('Cloudflare fetch failed, fallback to local storage', e);
-                }
-            }
-
-            const data = localStorage.getItem(STORAGE_KEY);
-            if(data) {
-                try {
-                    accData = JSON.parse(data);
-                    if (!Array.isArray(accData.auditLogs)) accData.auditLogs = [];
-                    if (!Array.isArray(accData.expenses)) accData.expenses = [];
-                } catch(e) {
-                    accData = { rate: 0.052, expenses: [], auditLogs: [] };
-                }
-            } else {
-                accData = { rate: 0.052, expenses: [], auditLogs: [] };
-            }
-        }
-
-        async function saveAccData(logAction, logDetails) {
-            if (!Array.isArray(accData.auditLogs)) accData.auditLogs = [];
-            if (logAction) {
-                const timestamp = new Date().toLocaleString();
-                accData.auditLogs.unshift({ timestamp, action: logAction, details: logDetails });
-            }
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(accData));
-
-            if (CLOUDFLARE_API_URL) {
-                try {
-                    await fetch(CLOUDFLARE_API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(accData)
-                    });
-                } catch(e) {
-                    console.error('Failed to sync to Cloudflare', e);
-                }
-            }
-
-            if(currentTab === 'ACCOUNTING') renderAccounting();
-        }
-        
-        loadAccData();
-
-        window.onload = function() {
-            switchTab('ALL'); 
-        };
-
-        function switchTab(tab) {
-            currentTab = tab;
-            document.querySelectorAll('.nav-tab').forEach(el => {
-                el.className = 'nav-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-full font-semibold mr-2 transition-colors cursor-pointer';
-            });
-
-            const topAccBtn = document.getElementById('top-acc-btn');
-            if (tab === 'ACCOUNTING') {
-                topAccBtn.classList.remove('bg-yellow-400', 'hover:bg-yellow-500', 'text-blue-900');
-                topAccBtn.classList.add('bg-indigo-600', 'text-white', 'ring-2', 'ring-offset-2', 'ring-indigo-600');
-            } else {
-                topAccBtn.classList.add('bg-yellow-400', 'hover:bg-yellow-500', 'text-blue-900');
-                topAccBtn.classList.remove('bg-indigo-600', 'text-white', 'ring-2', 'ring-offset-2', 'ring-indigo-600');
-                
-                const activeBtn = Array.from(document.querySelectorAll('.nav-tab')).find(el => el.getAttribute('onclick').includes(`('${tab}')`));
-                if(activeBtn) {
-                    activeBtn.className = 'nav-tab active-tab bg-blue-100 text-blue-700 px-4 py-2 rounded-full font-bold mr-2 transition-colors cursor-pointer ring-1 ring-blue-300';
-                }
-            }
-            renderContent(tab);
-        }
-
-        function requestOpenAudit() {
-            document.getElementById('pwd-input').value = '';
-            document.getElementById('pwd-error').classList.add('hidden');
-            document.getElementById('pwd-modal').style.display = 'flex';
-            setTimeout(() => document.getElementById('pwd-input').focus(), 100);
-        }
-
-        function closePwdModal() {
-            document.getElementById('pwd-modal').style.display = 'none';
-        }
-
-        function submitPassword() {
-            const pwd = document.getElementById('pwd-input').value;
-            if (pwd === 'ltwy') {
-                closePwdModal(); 
-                executeOpenAudit();
-            } else {
-                document.getElementById('pwd-error').classList.remove('hidden');
-                document.getElementById('pwd-input').value = '';
-                document.getElementById('pwd-input').focus();
-            }
-        }
-
-        function getGoogleMapsLink(searchQuery) {
-            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`;
-        }
-
-        function renderContent(tab) {
-            const sidebar = document.getElementById('sidebar-content');
-            sidebar.innerHTML = ''; 
-
-            if (tab === 'ACCOUNTING') {
-                renderAccounting();
-                return;
-            }
-
-            if (tab === 'MANUAL') {
-                sidebar.innerHTML = `
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 w-full mb-12">
-                        <h2 class="text-2xl font-bold mb-4 text-blue-800"><i class="fa-solid fa-book-open mr-2"></i>行車及求生手冊</h2>
-                        <div class="space-y-4">
-                            <div class="bg-blue-50 p-4 rounded-lg">
-                                <h3 class="font-bold text-blue-900 mb-2"><i class="fa-solid fa-car-side mr-2"></i>自駕注意事項</h3>
-                                <ul class="list-disc pl-5 text-sm text-gray-700 space-y-2">
-                                    <li><b>靠左行駛</b>：日本為右駕左行，時刻提醒司機「左邊、左邊」。轉彎口訣「左轉轉小彎，右轉轉大彎」。</li>
-                                    <li><b>「止まれ」(TOMARE) 標誌</b>：遇到紅色倒三角形標誌，必須<b>完全停車 3 秒</b>，確認左右無車後才可駛出。警察最常捉！</li>
-                                    <li><b>入油與還車</b>：還車前必須加滿油，保留最後一張入油收據。通常入 Regular (紅槍)。</li>
-                                    <li><b>泊車</b>：切勿違例泊車，罰款極高。請使用收費停車場。</li>
-                                </ul>
-                            </div>
-                            <div class="bg-purple-50 p-4 rounded-lg">
-                                <h3 class="font-bold text-purple-900 mb-2"><i class="fa-solid fa-ring mr-2"></i>婚禮準備清單</h3>
-                                <ul class="list-disc pl-5 text-sm text-gray-700 space-y-2">
-                                    <li><b>戰衣準備</b>：西裝 / 禮服、領帶、皮鞋及<b>深色襪子</b>。</li>
-                                    <li><b>狂歡必備</b>：解酒藥 (薑黃之力等，便利店有售)。</li>
-                                </ul>
-                            </div>
+            <div class="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-200 shadow-inner">
+                <h3 class="font-bold text-gray-800 mb-3 text-lg flex items-center"><i class="fa-solid fa-circle-plus mr-2 text-indigo-600"></i> 新增支出</h3>
+                <div class="space-y-4 mb-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">支出項目：</label>
+                        <input type="text" id="acc-desc" placeholder="輸入或下方選擇項目" class="p-2 border-2 border-gray-300 rounded focus:border-indigo-500 focus:outline-none w-full bg-white mb-2 text-base">
+                        <div class="flex flex-wrap gap-1.5">
+                            ${commonExpensePresets.map(preset => `
+                                <button type="button" onclick="setPresetDesc('${escapeHtml(preset)}')" class="px-2.5 py-1 text-xs font-medium bg-white border border-gray-300 rounded hover:bg-gray-100 text-gray-700 cursor-pointer shadow-sm">${escapeHtml(preset)}</button>
+                            `).join('')}
                         </div>
                     </div>
-                `;
-                return;
-            }
 
-            if (tab === 'ALL') {
-                let allHtml = `<div class="w-full space-y-6 pb-12">`;
-                const days = ['D1', 'D2', 'D3', 'D4', 'D5'];
-                const dayTitles = { 'D1': 'Day 1 (那霸 / 恩納村)', 'D2': 'Day 2 (青之洞窟 / ATV)', 'D3': 'Day 3 (本部町 / 婚禮)', 'D4': 'Day 4 (美國村 / 國際通)', 'D5': 'Day 5 (瀨長島 / 返港)' };
-                
-                days.forEach(d => {
-                    const dayPoints = itineraryData.filter(pt => pt.day === d);
-                    allHtml += `
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-                            <h3 class="font-bold text-lg text-blue-900 mb-3 border-b pb-2 flex items-center">
-                                <span class="bg-blue-100 text-blue-700 text-xs px-2.5 py-1 rounded-full mr-2">${d}</span>
-                                ${dayTitles[d]}
-                            </h3>
-                            <ul class="space-y-3 text-sm">
-                    `;
-                    dayPoints.forEach(pt => {
-                        const mapsLink = getGoogleMapsLink(pt.searchQuery);
-                        allHtml += `
-                            <li class="flex flex-col border-b border-gray-50 pb-3 gap-1">
-                                <div class="font-semibold text-gray-800 text-base">${pt.isHotel ? '🏠 ' : ''}${pt.title}</div>
-                                <div class="text-xs text-gray-500 mb-1">${pt.desc}</div>
-                                <a href="${mapsLink}" target="_blank" rel="noopener noreferrer" class="self-start inline-flex bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-medium items-center transition-colors">
-                                    <i class="fa-solid fa-location-arrow mr-1"></i> Google 地圖搜尋
-                                </a>
-                            </li>
-                        `;
-                    });
-                    allHtml += `</ul></div>`;
-                });
-                allHtml += `</div>`;
-                sidebar.innerHTML = allHtml;
-                return;
-            }
-
-            const points = itineraryData.filter(d => d.day === tab);
-            let seqCount = 1;
-            
-            let dayHtml = `<div class="w-full pb-12 space-y-4">`;
-            points.forEach(pt => {
-                let iconHtml = pt.isHotel ? '🏠' : seqCount;
-                if (!pt.isHotel) seqCount++;
-                const mapsLink = getGoogleMapsLink(pt.searchQuery);
-
-                dayHtml += `
-                    <div class="timeline-item">
-                        <div class="timeline-icon ${pt.isHotel ? 'timeline-hotel-icon' : ''}" style="${!pt.isHotel ? `background-color: ${pt.color}` : ''}">
-                            ${iconHtml}
-                        </div>
-                        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                            <h3 class="font-bold text-lg text-gray-800 mb-1">${pt.title}</h3>
-                            <p class="text-sm text-gray-600 mb-3">${pt.desc}</p>
-                            <div class="grid grid-cols-2 gap-2 text-xs text-gray-500 mb-3 bg-gray-50 p-2 rounded-lg">
-                                <div><i class="fa-solid fa-clock mr-1"></i> 行車: ${pt.travelTime}</div>
-                                <div><i class="fa-solid fa-square-parking mr-1"></i> 泊車: ${pt.parking}</div>
-                            </div>
-                            <a href="${mapsLink}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-full bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium py-2 px-4 rounded-lg transition-colors text-sm cursor-pointer">
-                                <i class="fa-solid fa-location-arrow mr-2"></i> Google 地圖搜尋
-                            </a>
+                    <div class="bg-green-50 p-3 rounded border border-green-200 shadow-sm">
+                        <label class="block text-xs font-bold text-green-800 mb-2">誰人付款（墊支）：</label>
+                        <div class="flex flex-wrap gap-2" id="payer-chips">
+                            ${accMembers.map(m => `
+                                <button type="button" data-payer-chip="${escapeHtml(m)}" onclick="selectPayer('${escapeHtml(m)}')" class="flex-1 min-w-[60px] py-2 px-1 text-sm font-bold rounded border-2 transition-colors cursor-pointer ${selectedPayer === m ? 'chip-on-green' : 'chip-off-green'}">${escapeHtml(m)}</button>
+                            `).join('')}
                         </div>
                     </div>
-                `;
-            });
-            dayHtml += `</div>`;
-            sidebar.innerHTML = dayHtml;
-        }
 
-        function renderAccounting() {
-            const sidebar = document.getElementById('sidebar-content');
-            
-            let balances = { 'Wing': 0, '天': 0, 'Kenson': 0, 'Michael': 0 };
-            let paid = { 'Wing': 0, '天': 0, 'Kenson': 0, 'Michael': 0 };
-            let consumed = { 'Wing': 0, '天': 0, 'Kenson': 0, 'Michael': 0 };
-            let totalHKD = 0;
-            
-            accData.expenses.forEach(ex => {
-                let hkd = ex.currency === 'JPY' ? ex.amount * accData.rate : ex.amount;
-                totalHKD += hkd;
-                paid[ex.payer] += hkd;
-                balances[ex.payer] += hkd; 
-                
-                if (ex.splitUser === '全部') {
-                    let share = hkd / 4;
-                    accMembers.forEach(m => {
-                        consumed[m] += share;
-                        balances[m] -= share; 
-                    });
-                } else {
-                    consumed[ex.splitUser] += hkd;
-                    balances[ex.splitUser] -= hkd; 
-                }
-            });
-            
-            let debtors = [];
-            let creditors = [];
-            
-            accMembers.forEach(m => {
-                let bal = balances[m];
-                if (bal < -0.01) debtors.push({name: m, amount: -bal});
-                else if (bal > 0.01) creditors.push({name: m, amount: bal});
-            });
-            
-            debtors.sort((a,b) => b.amount - a.amount);
-            creditors.sort((a,b) => b.amount - a.amount);
-            
-            let transfers = [];
-            let i = 0, j = 0;
-            while(i < debtors.length && j < creditors.length) {
-                let amt = Math.min(debtors[i].amount, creditors[j].amount);
-                transfers.push({from: debtors[i].name, to: creditors[j].name, amount: amt});
-                debtors[i].amount -= amt;
-                creditors[j].amount -= amt;
-                if(debtors[i].amount < 0.01) i++;
-                if(creditors[j].amount < 0.01) j++;
-            }
-
-            const filteredExpenses = accData.expenses.map((ex, idx) => ({ ...ex, originalIndex: idx })).filter(ex => {
-                if (selectedFilterUser === '全部') return true;
-                return ex.payer === selectedFilterUser || ex.splitUser === selectedFilterUser || ex.splitUser === '全部';
-            });
-
-            const expensesHtml = filteredExpenses.map((ex) => `
-                <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-gray-100 mb-2">
-                    <div class="flex-1">
-                        <div class="font-bold text-gray-800">${ex.desc}</div>
-                        <div class="text-xs mt-1">
-                            <span class="text-green-700 font-bold bg-green-50 px-1 rounded border border-green-200">墊: ${ex.payer}</span>
-                            <i class="fa-solid fa-arrow-right mx-1 text-gray-400"></i>
-                            <span class="text-red-700 font-bold bg-red-50 px-1 rounded border border-red-200">用: ${ex.splitUser === '全部' ? '全部人' : ex.splitUser}</span>
-                        </div>
-                    </div>
-                    <div class="text-right mr-3">
-                        <div class="font-bold text-indigo-600">${ex.currency} ${ex.amount.toLocaleString()}</div>
-                        ${ex.currency === 'JPY' ? `<div class="text-xs text-gray-400">≈ HKD ${(ex.amount * accData.rate).toFixed(1)}</div>` : ''}
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <button onclick="openEditModal(${ex.originalIndex})" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded cursor-pointer" title="修改">
-                            <i class="fa-solid fa-pen"></i>
-                        </button>
-                        <button onclick="requestDelete(${ex.originalIndex})" class="text-red-500 hover:text-red-700 bg-red-50 p-1.5 rounded cursor-pointer" title="刪除">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('') || '<div class="text-center text-gray-400 py-4">暫無支出紀錄</div>';
-
-            sidebar.innerHTML = `
-                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 w-full mb-12">
-                    <div class="flex justify-between items-center mb-4 border-b pb-3">
-                        <h2 class="text-2xl font-bold text-indigo-800"><i class="fa-solid fa-wallet mr-2"></i>兄弟記帳本</h2>
-                        <button onclick="requestOpenAudit()" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold py-1.5 px-3 rounded-lg text-xs shadow flex items-center cursor-pointer">
-                            <i class="fa-solid fa-shield-halved mr-1.5"></i> Log
-                        </button>
-                    </div>
-                    
-                    <div class="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-200 shadow-inner">
-                        <h3 class="font-bold text-gray-800 mb-3 text-lg flex items-center"><i class="fa-solid fa-circle-plus mr-2 text-indigo-600"></i> 新增支出</h3>
-                        <div class="space-y-4 mb-4">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-600 mb-1">支出項目：</label>
-                                <input type="text" id="acc-desc" placeholder="輸入或下方選擇項目" class="p-2 border-2 border-gray-300 rounded focus:border-indigo-500 focus:outline-none w-full bg-white mb-2 text-base">
-                                <div class="flex flex-wrap gap-1.5">
-                                    ${commonExpensePresets.map(preset => `
-                                        <button type="button" onclick="setPresetDesc('${preset}')" class="px-2.5 py-1 text-xs font-medium bg-white border border-gray-300 rounded hover:bg-gray-100 text-gray-700 cursor-pointer shadow-sm">
-                                            ${preset}
-                                        </button>
-                                    `).join('')}
-                                </div>
-                            </div>
-                            
-                            <div class="bg-green-50 p-3 rounded border border-green-200 shadow-sm">
-                                <label class="block text-xs font-bold text-green-800 mb-2">誰人付款 (墊支者出錢)：</label>
-                                <div class="flex flex-wrap gap-2">
-                                    ${accMembers.map(m => `
-                                        <button type="button" onclick="selectPayer('${m}')" class="flex-1 min-w-[60px] py-2 px-1 text-sm font-bold rounded border-2 transition-colors cursor-pointer ${selectedPayer === m ? 'bg-green-600 text-white border-green-700 shadow-md transform scale-105' : 'bg-white text-green-700 border-green-300 hover:bg-green-100'}">
-                                            ${m}
-                                        </button>
-                                    `).join('')}
-                                </div>
-                            </div>
-
-                            <div class="bg-red-50 p-3 rounded border border-red-200 shadow-sm">
-                                <label class="block text-xs font-bold text-red-800 mb-2">誰人享用 (使用者分攤)：</label>
-                                <div class="flex flex-col gap-2">
-                                    <button type="button" onclick="selectSplitUser('全部')" class="w-full py-2.5 px-2 text-sm font-bold rounded border-2 transition-colors cursor-pointer ${selectedSplitUser === '全部' ? 'bg-red-700 text-white border-red-800 shadow-md' : 'bg-white text-red-700 border-red-300 hover:bg-red-100'}">
-                                        全部人一齊 Share
-                                    </button>
-                                    <div class="flex flex-wrap gap-2">
-                                        ${accMembers.map(m => `
-                                            <button type="button" onclick="selectSplitUser('${m}')" class="flex-1 min-w-[60px] py-2 px-1 text-sm font-bold rounded border-2 transition-colors cursor-pointer ${selectedSplitUser === m ? 'bg-red-700 text-white border-red-800 shadow-md transform scale-105' : 'bg-white text-red-700 border-red-300 hover:bg-red-100'}">
-                                                ${m}
-                                            </button>
-                                        `).join('')}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flex gap-2 pt-1">
-                                <select id="acc-currency" class="p-3 border-2 border-gray-300 rounded font-bold focus:border-indigo-500 focus:outline-none w-1/3 bg-white text-base">
-                                    <option value="JPY">JPY ¥</option>
-                                    <option value="HKD">HKD $</option>
-                                </select>
-                                <input type="number" id="acc-amount" placeholder="輸入金額" class="p-3 border-2 border-gray-300 rounded font-bold focus:border-indigo-500 focus:outline-none w-2/3 bg-white text-lg">
-                            </div>
-                        </div>
-                        <button onclick="addExpense()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg py-3 rounded-lg transition-colors shadow-lg cursor-pointer flex justify-center items-center">
-                            <i class="fa-solid fa-check mr-2"></i> 記錄支出
-                        </button>
-                    </div>
-
-                    <div class="bg-blue-50 p-4 rounded-lg mb-8 border-2 border-blue-100 shadow-sm">
-                        <h3 class="font-bold text-blue-900 mb-3 text-lg"><i class="fa-solid fa-scale-balanced mr-2"></i>自動結算報告</h3>
-                        <div class="flex justify-between mb-4 bg-white p-3 rounded shadow-sm border border-blue-50 items-center">
-                            <span class="text-gray-600 font-bold">旅程總支出:</span>
-                            <span class="font-bold text-blue-800 text-xl">HKD ${totalHKD.toFixed(1)}</span>
-                        </div>
-                        <div class="border-t-2 border-blue-200 pt-4 pb-4 mb-2">
-                            <h4 class="font-bold text-gray-800 mb-2">各人財務明細 (HKD)</h4>
-                            <div class="space-y-2">
+                    <div class="bg-red-50 p-3 rounded border border-red-200 shadow-sm">
+                        <label class="block text-xs font-bold text-red-800 mb-2">誰人享用（可多選分攤）：</label>
+                        <div class="flex flex-col gap-2">
+                            <button type="button" id="split-all-btn" onclick="toggleSplitUser('全部')" class="w-full py-2.5 px-2 text-sm font-bold rounded border-2 transition-colors cursor-pointer ${allSplitOn ? 'chip-on-red' : 'chip-off-red'}">全部人一齊 Share</button>
+                            <div class="flex flex-wrap gap-2" id="split-chips">
                                 ${accMembers.map(m => `
-                                    <div class="flex justify-between items-center text-sm bg-white p-2.5 rounded shadow-sm border border-blue-100">
-                                        <span class="font-bold text-gray-800 w-16">${m}</span>
-                                        <span class="font-black text-base ml-2 ${balances[m] >= 0 ? 'text-green-600' : 'text-red-600'}">
-                                            ${balances[m] > 0 ? '收' : (balances[m] < 0 ? '付' : '平')} 
-                                            ${balances[m] > 0 ? '+' : ''}${balances[m].toFixed(1)}
-                                        </span>
-                                    </div>
+                                    <button type="button" data-split-chip="${escapeHtml(m)}" onclick="toggleSplitUser('${escapeHtml(m)}')" class="flex-1 min-w-[60px] py-2 px-1 text-sm font-bold rounded border-2 transition-colors cursor-pointer ${selectedSplitUsers.includes(m) ? 'chip-on-red' : 'chip-off-red'}">${escapeHtml(m)}</button>
                                 `).join('')}
                             </div>
                         </div>
-                        <div class="border-t-2 border-blue-200 pt-4">
-                            <h4 class="font-bold text-gray-800 mb-3 bg-yellow-100 inline-block px-2 py-1 rounded">最終找數清單</h4>
-                            ${transfers.map(t => `
-                                <div class="flex items-center justify-between bg-green-50 p-3 rounded-lg border border-green-200 mb-2 shadow-sm">
-                                    <div class="font-bold text-gray-800">${t.from}</div>
-                                    <div class="flex flex-col items-center text-green-600 px-4">
-                                        <span class="text-[10px] bg-green-200 text-green-800 px-2 rounded-full mb-1">俾錢</span>
-                                        <i class="fa-solid fa-arrow-right"></i>
-                                        <span class="font-bold text-sm mt-1">HKD ${t.amount.toFixed(1)}</span>
-                                    </div>
-                                    <div class="font-bold text-gray-800">${t.to}</div>
-                                </div>
-                            `).join('') || '<div class="text-center text-gray-400 py-2">目前無欠款，大家都清晒！</div>'}
-                        </div>
                     </div>
 
-                    <div class="mb-6 border-t border-gray-200 pt-6">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-                            <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-list-check mr-2 text-indigo-600"></i>歷史紀錄</h3>
-                        </div>
-                        <div class="space-y-2">
-                            ${expensesHtml}
-                        </div>
+                    <div class="flex gap-2 pt-1">
+                        <select id="acc-currency" class="p-3 border-2 border-gray-300 rounded font-bold focus:border-indigo-500 focus:outline-none w-1/3 bg-white text-base">
+                            <option value="JPY">JPY ¥</option>
+                            <option value="HKD">HKD $</option>
+                        </select>
+                        <input type="number" id="acc-amount" inputmode="decimal" step="any" placeholder="輸入金額" class="p-3 border-2 border-gray-300 rounded font-bold focus:border-indigo-500 focus:outline-none w-2/3 bg-white text-lg">
                     </div>
                 </div>
-            `;
-        }
-
-        let tempEditPayer = 'Wing';
-        let tempEditSplitUser = '全部';
-
-        function openEditModal(index) {
-            const ex = accData.expenses[index];
-            if (!ex) return;
-            document.getElementById('edit-index').value = index;
-            document.getElementById('edit-desc').value = ex.desc;
-            document.getElementById('edit-currency').value = ex.currency;
-            document.getElementById('edit-amount').value = ex.amount;
-            tempEditPayer = ex.payer;
-            tempEditSplitUser = ex.splitUser;
-            renderEditModalButtons();
-            document.getElementById('edit-modal').style.display = 'flex';
-        }
-
-        function renderEditModalButtons() {
-            const payerContainer = document.getElementById('edit-payer-buttons');
-            payerContainer.className = "flex flex-wrap gap-2";
-            payerContainer.innerHTML = accMembers.map(m => `
-                <button type="button" onclick="setEditPayer('${m}')" class="flex-1 min-w-[60px] py-2 text-sm font-bold rounded border-2 cursor-pointer ${tempEditPayer === m ? 'bg-green-600 text-white border-green-700 shadow' : 'bg-white text-green-700 border-green-300 hover:bg-green-50'}">
-                    ${m}
+                <button type="button" onclick="addExpense()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg py-3 rounded-lg transition-colors shadow-lg cursor-pointer flex justify-center items-center">
+                    <i class="fa-solid fa-check mr-2"></i> 記錄支出
                 </button>
-            `).join('');
+            </div>
 
-            const splitContainer = document.getElementById('edit-split-buttons');
-            splitContainer.className = "flex flex-col gap-2";
-            splitContainer.innerHTML = `
-                <button type="button" onclick="setEditSplit('全部')" class="w-full py-2 text-sm font-bold rounded border-2 cursor-pointer ${tempEditSplitUser === '全部' ? 'bg-red-700 text-white border-red-800 shadow' : 'bg-white text-red-700 border-red-300 hover:bg-red-50'}">
-                    全部人一齊 Share
-                </button>
-                <div class="flex flex-wrap gap-2">
-                    ${accMembers.map(m => `
-                        <button type="button" onclick="setEditSplit('${m}')" class="flex-1 min-w-[60px] py-2 text-sm font-bold rounded border-2 cursor-pointer ${tempEditSplitUser === m ? 'bg-red-700 text-white border-red-800 shadow' : 'bg-white text-red-700 border-red-300 hover:bg-red-50'}">
-                            ${m}
-                        </button>
-                    `).join('')}
+            <div class="bg-blue-50 p-4 rounded-lg mb-8 border-2 border-blue-100 shadow-sm">
+                <h3 class="font-bold text-blue-900 mb-3 text-lg"><i class="fa-solid fa-scale-balanced mr-2"></i>自動結算報告</h3>
+                <div class="flex justify-between mb-4 bg-white p-3 rounded shadow-sm border border-blue-50 items-center">
+                    <span class="text-gray-600 font-bold">旅程總支出：</span>
+                    <span class="font-bold text-blue-800 text-xl">HKD ${totalHKD.toFixed(1)}</span>
                 </div>
-            `;
-        }
-
-        function setEditPayer(m) { tempEditPayer = m; renderEditModalButtons(); }
-        function setEditSplit(u) { tempEditSplitUser = u; renderEditModalButtons(); }
-        function closeEditModal() { document.getElementById('edit-modal').style.display = 'none'; }
-
-        function confirmSaveEditedExpense() {
-            showConfirm("確定要儲存修改嗎？", () => {
-                saveEditedExpense();
-            });
-        }
-
-        function saveEditedExpense() {
-            const index = parseInt(document.getElementById('edit-index').value);
-            const desc = document.getElementById('edit-desc').value.trim();
-            const currency = document.getElementById('edit-currency').value;
-            const amount = parseFloat(document.getElementById('edit-amount').value);
-
-            if (!desc || isNaN(amount) || amount <= 0) {
-                showConfirm("請輸入完整的項目名稱與有效金額！", null, "知道", "", true);
-                return;
-            }
-
-            const oldEx = accData.expenses[index];
-            accData.expenses[index] = { desc, payer: tempEditPayer, splitUser: tempEditSplitUser, currency, amount };
-            saveAccData('修改紀錄', `將 [${oldEx.desc} ${oldEx.currency}${oldEx.amount}] 改為 [${desc} ${currency}${amount}] (墊支:${tempEditPayer}, 分攤:${tempEditSplitUser})`);
-            closeEditModal();
-        }
-
-        function setPresetDesc(preset) {
-            const descEl = document.getElementById('acc-desc');
-            if(descEl) descEl.value = preset;
-        }
-
-        function selectPayer(name) {
-            const descEl = document.getElementById('acc-desc');
-            const amountEl = document.getElementById('acc-amount');
-            const currEl = document.getElementById('acc-currency');
-            
-            const currentDesc = descEl ? descEl.value : '';
-            const currentAmount = amountEl ? amountEl.value : '';
-            const currentCurr = currEl ? currEl.value : 'JPY';
-
-            selectedPayer = name;
-            renderAccounting();
-
-            setTimeout(() => {
-                if(document.getElementById('acc-desc')) document.getElementById('acc-desc').value = currentDesc;
-                if(document.getElementById('acc-amount')) document.getElementById('acc-amount').value = currentAmount;
-                if(document.getElementById('acc-currency')) document.getElementById('acc-currency').value = currentCurr;
-            }, 0);
-        }
-
-        function selectSplitUser(user) {
-            const descEl = document.getElementById('acc-desc');
-            const amountEl = document.getElementById('acc-amount');
-            const currEl = document.getElementById('acc-currency');
-            
-            const currentDesc = descEl ? descEl.value : '';
-            const currentAmount = amountEl ? amountEl.value : '';
-            const currentCurr = currEl ? currEl.value : 'JPY';
-
-            selectedSplitUser = user;
-            renderAccounting();
-
-            setTimeout(() => {
-                if(document.getElementById('acc-desc')) document.getElementById('acc-desc').value = currentDesc;
-                if(document.getElementById('acc-amount')) document.getElementById('acc-amount').value = currentAmount;
-                if(document.getElementById('acc-currency')) document.getElementById('acc-currency').value = currentCurr;
-            }, 0);
-        }
-
-        function addExpense() {
-            const descInput = document.getElementById('acc-desc');
-            const amountInput = document.getElementById('acc-amount');
-            const currencyInput = document.getElementById('acc-currency');
-
-            const desc = descInput.value.trim();
-            const currency = currencyInput.value;
-            const amount = parseFloat(amountInput.value);
-
-            if (!desc || isNaN(amount) || amount <= 0) {
-                showConfirm("請輸入完整的項目名稱與有效金額！", null, "知道", "", true);
-                return;
-            }
-
-            const savedPayer = selectedPayer;
-            const savedSplit = selectedSplitUser;
-            
-            accData.expenses.push({ desc, payer: savedPayer, splitUser: savedSplit, currency, amount });
-            
-            selectedPayer = 'Wing'; 
-            selectedSplitUser = '全部'; 
-            saveAccData('新增紀錄', `新增: ${desc} - ${currency} ${amount} (墊支:${savedPayer}, 分攤:${savedSplit})`);
-        }
-
-        function requestDelete(index) {
-            showConfirm("確定要刪除這筆紀錄嗎？", () => {
-                setTimeout(() => {
-                    showConfirm("唔好以為自己靜靜雞delete咗無人知😏", () => {
-                        executeDelete(index);
-                    });
-                }, 250);
-            });
-        }
-
-        function executeDelete(index) {
-            if (index >= 0 && index < accData.expenses.length) {
-                const ex = accData.expenses[index];
-                accData.expenses.splice(index, 1);
-                saveAccData('刪除紀錄', `刪除: ${ex.desc} (${ex.currency} ${ex.amount} 墊支:${ex.payer})`);
-            }
-        }
-
-        function executeOpenAudit() {
-            const listEl = document.getElementById('audit-logs-list');
-            listEl.innerHTML = accData.auditLogs.map(log => `
-                <div class="border-b border-gray-200 pb-2 mb-2">
-                    <div class="text-gray-400 mb-1 text-[10px]"><i class="fa-regular fa-clock mr-1"></i>${log.timestamp}</div> 
-                    <strong class="text-indigo-600 bg-indigo-50 px-1 rounded">${log.action}</strong> 
-                    <span class="text-gray-800 font-bold ml-1">${log.details}</span>
+                <div class="border-t-2 border-blue-200 pt-4 pb-4 mb-2">
+                    <h4 class="font-bold text-gray-800 mb-2">各人財務明細（HKD）</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm bg-white rounded shadow-sm border border-blue-100">
+                            <thead>
+                                <tr class="bg-blue-100/60 text-left text-xs text-blue-900">
+                                    <th class="p-2">成員</th>
+                                    <th class="p-2 text-right">已付</th>
+                                    <th class="p-2 text-right">已用</th>
+                                    <th class="p-2 text-right">淨額</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${accMembers.map(m => `
+                                    <tr class="border-t border-blue-50">
+                                        <td class="p-2 font-bold text-gray-800">${escapeHtml(m)}</td>
+                                        <td class="p-2 text-right text-green-700">${paid[m].toFixed(1)}</td>
+                                        <td class="p-2 text-right text-red-700">${consumed[m].toFixed(1)}</td>
+                                        <td class="p-2 text-right font-black ${balances[m] >= 0 ? 'text-green-600' : 'text-red-600'}">
+                                            ${balances[m] > 0 ? '收 +' : (balances[m] < 0 ? '付 ' : '平 ')}${balances[m].toFixed(1)}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            `).join('') || '<div class="text-gray-400 text-center py-4">尚無足跡</div>';
-            document.getElementById('audit-modal').style.display = 'flex';
-        }
+                <div class="border-t-2 border-blue-200 pt-4">
+                    <h4 class="font-bold text-gray-800 mb-3 bg-yellow-100 inline-block px-2 py-1 rounded">最終找數清單</h4>
+                    ${transfers.map(t => `
+                        <div class="flex items-center justify-between bg-green-50 p-3 rounded-lg border border-green-200 mb-2 shadow-sm">
+                            <div class="font-bold text-gray-800">${escapeHtml(t.from)}</div>
+                            <div class="flex flex-col items-center text-green-600 px-4">
+                                <span class="text-[10px] bg-green-200 text-green-800 px-2 rounded-full mb-1">俾錢</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                                <span class="font-bold text-sm mt-1">HKD ${t.amount.toFixed(1)}</span>
+                            </div>
+                            <div class="font-bold text-gray-800">${escapeHtml(t.to)}</div>
+                        </div>
+                    `).join('') || '<div class="text-center text-gray-400 py-2">目前無欠款，大家都清晒！</div>'}
+                </div>
+            </div>
 
-        function closeAuditModal() {
-            document.getElementById('audit-modal').style.display = 'none';
-        }
-    </script>
+            <div class="mb-6 border-t border-gray-200 pt-6">
+                <div class="flex flex-col gap-3 mb-4">
+                    <h3 class="font-bold text-gray-800 text-lg"><i class="fa-solid fa-list-check mr-2 text-indigo-600"></i>歷史紀錄</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" onclick="setFilterUser('全部')" class="px-3 py-1.5 text-xs font-bold rounded-full border-2 cursor-pointer ${selectedFilterUser === '全部' ? 'chip-on-indigo' : 'chip-off-indigo'}">全部</button>
+                        ${accMembers.map(m => `
+                            <button type="button" onclick="setFilterUser('${escapeHtml(m)}')" class="px-3 py-1.5 text-xs font-bold rounded-full border-2 cursor-pointer ${selectedFilterUser === m ? 'chip-on-indigo' : 'chip-off-indigo'}">${escapeHtml(m)}</button>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="space-y-2">${expensesHtml}</div>
+            </div>
+        </div>`;
+}
+
+function openEditModal(id) {
+    const ex = accData.expenses.find(e => e.id === id);
+    if (!ex) return;
+    document.getElementById('edit-id').value = id;
+    document.getElementById('edit-desc').value = ex.desc;
+    document.getElementById('edit-currency').value = ex.currency;
+    document.getElementById('edit-amount').value = ex.amount;
+    tempEditPayer = ex.payer;
+    tempEditSplitUsers = [...(ex.splitUsers || accMembers)];
+    renderEditModalButtons();
+    document.getElementById('edit-modal').style.display = 'flex';
+}
+
+function renderEditModalButtons() {
+    const payerContainer = document.getElementById('edit-payer-buttons');
+    payerContainer.innerHTML = accMembers.map(m => `
+        <button type="button" onclick="setEditPayer('${escapeHtml(m)}')" class="flex-1 min-w-[60px] py-2 text-sm font-bold rounded border-2 cursor-pointer ${tempEditPayer === m ? 'chip-on-green' : 'chip-off-green'}">${escapeHtml(m)}</button>
+    `).join('');
+
+    const allOn = tempEditSplitUsers.length === accMembers.length;
+    const splitContainer = document.getElementById('edit-split-buttons');
+    splitContainer.innerHTML = `
+        <button type="button" onclick="setEditSplitAll()" class="w-full py-2 text-sm font-bold rounded border-2 cursor-pointer ${allOn ? 'chip-on-red' : 'chip-off-red'}">全部人一齊 Share</button>
+        <div class="flex flex-wrap gap-2">
+            ${accMembers.map(m => `
+                <button type="button" onclick="toggleEditSplit('${escapeHtml(m)}')" class="flex-1 min-w-[60px] py-2 text-sm font-bold rounded border-2 cursor-pointer ${tempEditSplitUsers.includes(m) ? 'chip-on-red' : 'chip-off-red'}">${escapeHtml(m)}</button>
+            `).join('')}
+        </div>`;
+}
+
+function setEditPayer(m) { tempEditPayer = m; renderEditModalButtons(); }
+function setEditSplitAll() { tempEditSplitUsers = [...accMembers]; renderEditModalButtons(); }
+function toggleEditSplit(user) {
+    if (tempEditSplitUsers.length === accMembers.length) {
+        tempEditSplitUsers = [user];
+    } else if (tempEditSplitUsers.includes(user)) {
+        tempEditSplitUsers = tempEditSplitUsers.filter(u => u !== user);
+        if (!tempEditSplitUsers.length) tempEditSplitUsers = [user];
+    } else {
+        tempEditSplitUsers = [...tempEditSplitUsers, user];
+    }
+    renderEditModalButtons();
+}
+function closeEditModal() { document.getElementById('edit-modal').style.display = 'none'; }
+
+function confirmSaveEditedExpense() {
+    showConfirm('確定要儲存修改嗎？', () => saveEditedExpense());
+}
+
+function saveEditedExpense() {
+    const id = document.getElementById('edit-id').value;
+    const desc = document.getElementById('edit-desc').value.trim();
+    const currency = document.getElementById('edit-currency').value;
+    const amount = parseFloat(document.getElementById('edit-amount').value);
+    if (!desc || isNaN(amount) || amount <= 0) {
+        showConfirm('請輸入完整的項目名稱與有效金額！', null, '知道', '', true);
+        return;
+    }
+    const idx = accData.expenses.findIndex(e => e.id === id);
+    if (idx < 0) return;
+    const oldEx = accData.expenses[idx];
+    accData.expenses[idx] = normalizeExpense({
+        id,
+        desc,
+        payer: tempEditPayer,
+        splitUsers: tempEditSplitUsers,
+        currency,
+        amount,
+        updatedAt: nowTs()
+    });
+    saveAccData('修改紀錄', `將 [${oldEx.desc} ${oldEx.currency}${oldEx.amount}] 改為 [${desc} ${currency}${amount}] (墊支:${tempEditPayer}, 分攤:${formatSplitLabel(tempEditSplitUsers)})`);
+    closeEditModal();
+}
+
+function addExpense() {
+    const desc = document.getElementById('acc-desc').value.trim();
+    const currency = document.getElementById('acc-currency').value;
+    const amount = parseFloat(document.getElementById('acc-amount').value);
+    if (!desc || isNaN(amount) || amount <= 0) {
+        showConfirm('請輸入完整的項目名稱與有效金額！', null, '知道', '', true);
+        return;
+    }
+    if (!selectedSplitUsers.length) {
+        showConfirm('請至少揀一位分攤對象！', null, '知道', '', true);
+        return;
+    }
+    const savedPayer = selectedPayer;
+    const savedSplit = [...selectedSplitUsers];
+    accData.expenses.push(normalizeExpense({
+        id: genId(),
+        desc,
+        payer: savedPayer,
+        splitUsers: savedSplit,
+        currency,
+        amount,
+        updatedAt: nowTs()
+    }));
+    selectedPayer = 'Wing';
+    selectedSplitUsers = [...accMembers];
+    document.getElementById('acc-desc').value = '';
+    document.getElementById('acc-amount').value = '';
+    saveAccData('新增紀錄', `新增: ${desc} - ${currency} ${amount} (墊支:${savedPayer}, 分攤:${formatSplitLabel(savedSplit)})`);
+}
+
+function requestDelete(id) {
+    showConfirm('確定要刪除這筆紀錄嗎？', () => executeDelete(id));
+}
+
+function executeDelete(id) {
+    const idx = accData.expenses.findIndex(e => e.id === id);
+    if (idx < 0) return;
+    const ex = accData.expenses[idx];
+    accData.expenses.splice(idx, 1);
+    saveAccData('刪除紀錄', `刪除: ${ex.desc} (${ex.currency} ${ex.amount} 墊支:${ex.payer})`);
+}
+
+document.getElementById('nav-tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('.nav-tab');
+    if (!btn) return;
+    const tab = btn.getAttribute('data-tab');
+    if (tab) switchTab(tab);
+});
+
+(async function init() {
+    setSyncStatus(CLOUDFLARE_API_URL ? 'syncing' : 'local');
+    await loadAccData();
+    switchTab('ALL');
+})();
+</script>
 </body>
 </html>
