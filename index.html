@@ -3,6 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        /* Unlock before first paint. If this fails, the page stays locked. */
+        (function () {
+            try {
+                if (localStorage.getItem('okTripUnlocked') === '1') {
+                    document.documentElement.classList.add('app-unlocked');
+                }
+            } catch (e) {}
+        })();
+    </script>
     <meta name="theme-color" content="#1e3a8a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -232,10 +242,118 @@
             width: 100%;
         }
         .map-show-btn:hover { background: #4338ca; }
+
+        /* Password gate does not use Tailwind. cdn.tailwindcss.com is a runtime
+           stylesheet; if it fails, utility classes never apply and a gate that
+           only has "fixed inset-0" sits under the itinerary. */
+        html:not(.app-unlocked) #app-container {
+            display: none !important;
+        }
+        html:not(.app-unlocked),
+        html:not(.app-unlocked) body {
+            overflow: hidden;
+            height: 100%;
+        }
+        #app-gate {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 1rem;
+            background: #172554;
+        }
+        html.app-unlocked #app-gate {
+            display: none !important;
+        }
+        #app-gate .gate-card {
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 24rem;
+            background: #fff;
+            color: #1f2937;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
+            padding: 1.5rem;
+            text-align: center;
+        }
+        #app-gate .gate-mark {
+            font-size: 2.25rem;
+            line-height: 1;
+            margin-bottom: 0.75rem;
+        }
+        #app-gate .gate-title {
+            margin: 0 0 0.25rem;
+            font-size: 1.25rem;
+            line-height: 1.4;
+            font-weight: 700;
+            color: #1e3a8a;
+        }
+        #app-gate .gate-prompt {
+            margin: 0 0 1rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #4b5563;
+        }
+        #app-gate .gate-input {
+            box-sizing: border-box;
+            width: 100%;
+            margin: 0 0 0.5rem;
+            padding: 0.75rem;
+            border: 2px solid #d1d5db;
+            border-radius: 0.5rem;
+            background: #fff;
+            color: #111827;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 1.125rem;
+            text-align: center;
+            letter-spacing: 0.2em;
+        }
+        #app-gate .gate-input:focus {
+            border-color: #2563eb;
+            outline: none;
+        }
+        #app-gate .gate-error {
+            display: none;
+            margin: 0 0 0.75rem;
+            color: #ef4444;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        #app-gate .gate-error.is-on {
+            display: block;
+        }
+        #app-gate .gate-submit {
+            width: 100%;
+            margin: 0;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 0.5rem;
+            background: #1e3a8a;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.12);
+        }
+        #app-gate .gate-submit:hover { background: #1e40af; }
     </style>
 </head>
 <body>
-<div id="app-container">
+<!-- Unlock gate: inline position so it still covers the page if the stylesheet or Tailwind CDN fails. -->
+<div id="app-gate" role="dialog" aria-modal="true" aria-labelledby="gate-title" style="position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:1rem;background:#172554;">
+    <form class="gate-card" onsubmit="event.preventDefault(); submitAppGate();" style="box-sizing:border-box;width:100%;max-width:24rem;background:#fff;border-radius:1rem;padding:1.5rem;text-align:center;">
+        <div class="gate-mark" aria-hidden="true">🇯🇵</div>
+        <h2 id="gate-title" class="gate-title">綠林快槍手沖繩之旅</h2>
+        <p class="gate-prompt">請輸入<strong>綠林快槍手密碼</strong>以查看行程</p>
+        <input type="password" id="gate-input" class="gate-input" inputmode="numeric" autocomplete="off" placeholder="輸入密碼" aria-label="綠林快槍手密碼">
+        <p id="gate-error" class="gate-error" style="display:none">密碼不正確，請再試一次</p>
+        <button type="submit" class="gate-submit">點擊打開綠寶</button>
+    </form>
+</div>
+<div id="app-container" inert>
     <header class="bg-white shadow-sm z-20 shrink-0">
         <div class="px-4 py-3 flex justify-between items-center bg-blue-900 text-white gap-2">
             <h1 class="font-bold text-lg truncate flex-1">綠林快槍手沖繩之旅</h1>
@@ -256,21 +374,6 @@
     </header>
     <div class="content-wrapper">
         <div class="scroll-section max-w-2xl mx-auto w-full" id="sidebar-content"></div>
-    </div>
-</div>
-
-
-<!-- App unlock gate -->
-<div id="app-gate" class="fixed inset-0 bg-blue-950/95 z-[100] flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full text-center">
-        <div class="text-4xl mb-3">🇯🇵</div>
-        <h2 class="text-xl font-bold text-blue-900 mb-1">綠林快槍手沖繩之旅</h2>
-        <p class="text-sm text-gray-600 mb-4">請輸入<strong>綠林快槍手密碼</strong>以查看行程</p>
-        <input type="password" id="gate-input" inputmode="numeric" autocomplete="off" placeholder="輸入密碼"
-            onkeydown="if(event.key==='Enter')submitAppGate()"
-            class="w-full p-3 border-2 border-gray-300 rounded-lg mb-2 focus:border-blue-600 focus:outline-none font-mono text-center tracking-widest text-lg">
-        <p id="gate-error" class="text-red-500 text-xs font-bold mb-3 hidden">密碼不正確，請再試一次</p>
-        <button type="button" onclick="submitAppGate()" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 rounded-lg cursor-pointer shadow-md">點擊打開綠寶</button>
     </div>
 </div>
 
@@ -362,11 +465,11 @@ const AUDIT_PASS_HASH = '3afddfdd432759f906ff30983fbecfd56b022e56433b598d2b04e31
 const itineraryData = [
     { day: 'D1', time: '13:10', title: 'HB336 抵達那霸機場', isHotel: false, color: '#3b82f6', travelTime: '抵達', parking: '機場', desc: '香港 09:45 起飛 → 沖繩 13:10 抵達。過關提取行李後前往 Clover 接駁點。', lat: 26.2065, lng: 127.6465, searchQuery: '那霸機場' },
     { day: 'D1', time: '14:30', title: 'Clover 取車（Voxy 或類似）', isHotel: false, color: '#3b82f6', travelTime: '接駁約 15分鐘', parking: 'Clover 停車場', desc: '訂單取車 14:30（HB336 抵達後過關＋接駁）。檢查車況、保險、加油規矩；導航用電話即可。', lat: 26.1838, lng: 127.6655, searchQuery: '那霸機場 租車 Clover' },
-    { day: 'D1', time: '16:00', title: '殘波岬燈塔 & 壯麗斷崖', isHotel: false, color: '#3b82f6', travelTime: '約 70–80分鐘', parking: '免費停車場', desc: '機場周邊北上約 70–80 分（一般道路與高速公路時間相近）。短停燈塔與斷崖拍照（約 35–40 分鐘）。', lat: 26.4411, lng: 127.7125, searchQuery: '殘波岬燈塔 沖繩' },
-    { day: 'D1', time: '17:00', title: '浜の家海鮮食堂 稍晚午餐', isHotel: false, color: '#3b82f6', travelTime: '約 20分鐘', parking: '餐廳專屬停車場 (免費)', desc: '殘波→仲泊約 20 分。當地新鮮海產，奶油烤魚必試。', lat: 26.4358, lng: 127.7922, searchQuery: '浜の家海鮮食堂 恩納村' },
-    { day: 'D1', time: '18:30', title: 'グランディオーソ沖縄プールヴィラ恩納 7D 入住', isHotel: true, color: '#ef4444', travelTime: '約 20分鐘', parking: '住宿附設停車位', desc: '〒904-0402 恩納村安富祖1854-7。Trip.com 訂單 1578951053121146／PIN 1480；16:00–23:00 入住。午餐後北上安富祖約 20 分。', lat: 26.5125, lng: 127.9005, searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
-    { day: 'D1', time: '19:00', title: '恩納村海灘／別墅休整', isHotel: false, color: '#3b82f6', travelTime: '約 5分鐘', parking: '海灘公共停車場', desc: '11 月日落較早；入住後短途散步或泳池休整，再出發用晚餐。', lat: 26.511, lng: 127.8975, searchQuery: '恩納村 海灘' },
-    { day: 'D1', time: '19:45', title: '琉球之牛 (恩納店) 晚餐', isHotel: false, color: '#3b82f6', travelTime: '約 10分鐘', parking: '餐廳專屬/附近收費停車場', desc: '頂級沖繩和牛燒肉，第一日行程結束。建議預先訂位。', lat: 26.4469, lng: 127.8042, searchQuery: '琉球之牛 恩納店' },
+    { day: 'D1', time: '16:00', title: '浜の家海鮮食堂 午餐', isHotel: false, color: '#3b82f6', travelTime: '約 70–80分鐘', parking: '餐廳專屬停車場 (免費)', desc: '取車後先北上仲泊用餐，車程約 70–80 分。當地新鮮海產，奶油烤魚必試。', lat: 26.4358, lng: 127.7922, searchQuery: '浜の家海鮮食堂 恩納村' },
+    { day: 'D1', time: '17:00', title: '殘波岬燈塔 & 壯麗斷崖', isHotel: false, color: '#3b82f6', travelTime: '約 20分鐘', parking: '免費停車場', desc: '午餐後前往殘波岬，仲泊→殘波約 20 分。短停燈塔與斷崖拍照（約 35–40 分鐘）。', lat: 26.4411, lng: 127.7125, searchQuery: '殘波岬燈塔 沖繩' },
+    { day: 'D1', time: '18:15', title: 'グランディオーソ沖縄プールヴィラ恩納 7D 入住', isHotel: true, color: '#ef4444', travelTime: '約 30–40分鐘', parking: '住宿附設停車位', desc: '〒904-0402 恩納村安富祖1854-7。Trip.com 訂單 1578951053121146／PIN 1480；16:00–23:00 入住。殘波岬後北上安富祖約 30–40 分。', lat: 26.5125, lng: 127.9005, searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
+    { day: 'D1', time: '18:40', title: '恩納村海灘／別墅休整', isHotel: false, color: '#3b82f6', travelTime: '約 5分鐘', parking: '海灘公共停車場', desc: '11 月日落較早；入住後稍作休整，再出發用晚餐。', lat: 26.511, lng: 127.8975, searchQuery: '恩納村 海灘' },
+    { day: 'D1', time: '19:00', title: '琉球之牛 (恩納店) 晚餐', isHotel: false, color: '#3b82f6', travelTime: '約 10分鐘', parking: '餐廳專屬/附近收費停車場', desc: '約 19:00 享用頂級沖繩和牛燒肉，第一日行程結束。建議預先訂位。', lat: 26.4469, lng: 127.8042, searchQuery: '琉球之牛 恩納店' },
 
     { day: 'D2', time: '09:00', title: '別墅出發', isHotel: true, color: '#10b981', travelTime: '起點', parking: '住宿附設停車位', desc: '早上集合出發。', lat: 26.5125, lng: 127.9005, searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
     { day: 'D2', time: '09:30', title: '青之洞窟 (真榮田岬) 浮潛', isHotel: false, color: '#10b981', travelTime: '約 20–25分鐘', parking: '真榮田岬收費停車場', desc: '安富祖→真榮田約 20–25 分。09:30–11:30 藍洞浮潛。旺季建議及早預約店家。', lat: 26.4447, lng: 127.7724, searchQuery: '真榮田岬 青之洞窟' },
@@ -897,6 +1000,11 @@ function showAllStopOnMap(day, idx) {
 window.showAllStopOnMap = showAllStopOnMap;
 
 function switchTab(tab) {
+    if (!isAppUnlocked()) {
+        showAppGate();
+        return;
+    }
+    hideAppGate();
     currentTab = tab;
     document.querySelectorAll('.nav-tab').forEach(el => {
         el.className = 'nav-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-full font-semibold mr-2 transition-colors cursor-pointer';
@@ -1000,6 +1108,7 @@ function handbookSearchHtml() {
 }
 
 function renderContent(tab) {
+    if (!document.documentElement.classList.contains('app-unlocked')) return;
     const sidebar = document.getElementById('sidebar-content');
     destroyDayMap();
     sidebar.innerHTML = '';
@@ -1597,21 +1706,34 @@ const APP_GATE_KEY = 'okTripUnlocked';
 const APP_GATE_PASSWORD = '666666';
 
 function isAppUnlocked() {
+    if (document.documentElement.classList.contains('app-unlocked')) return true;
     try { return localStorage.getItem(APP_GATE_KEY) === '1'; } catch (e) { return false; }
 }
 
+function setGateError(show) {
+    const err = document.getElementById('gate-error');
+    if (!err) return;
+    err.classList.toggle('is-on', !!show);
+    err.style.display = show ? 'block' : 'none';
+}
+
 function hideAppGate() {
+    document.documentElement.classList.add('app-unlocked');
     const gate = document.getElementById('app-gate');
+    const app = document.getElementById('app-container');
     if (gate) gate.style.display = 'none';
+    if (app) app.removeAttribute('inert');
 }
 
 function showAppGate() {
+    document.documentElement.classList.remove('app-unlocked');
     const gate = document.getElementById('app-gate');
+    const app = document.getElementById('app-container');
+    if (app) app.setAttribute('inert', '');
     if (!gate) return;
     gate.style.display = 'flex';
-    const err = document.getElementById('gate-error');
+    setGateError(false);
     const input = document.getElementById('gate-input');
-    if (err) err.classList.add('hidden');
     if (input) {
         input.value = '';
         setTimeout(() => input.focus(), 80);
@@ -1620,14 +1742,13 @@ function showAppGate() {
 
 function submitAppGate() {
     const input = document.getElementById('gate-input');
-    const err = document.getElementById('gate-error');
     const pwd = (input && input.value ? input.value : '').trim();
     if (pwd === APP_GATE_PASSWORD) {
         try { localStorage.setItem(APP_GATE_KEY, '1'); } catch (e) {}
         hideAppGate();
         bootApp();
     } else {
-        if (err) err.classList.remove('hidden');
+        setGateError(true);
         if (input) {
             input.value = '';
             input.focus();
