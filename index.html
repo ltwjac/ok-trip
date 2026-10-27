@@ -51,35 +51,59 @@
         }
         .tabs-container::-webkit-scrollbar { display: none; }
 
-        .timeline-item { position: relative; padding-left: 2.5rem; margin-bottom: 1.5rem; }
+        .timeline-item {
+            position: relative;
+            display: grid;
+            grid-template-columns: 2.25rem minmax(0, 1fr);
+            column-gap: 0.85rem;
+            margin-bottom: 1.5rem;
+            align-items: start;
+        }
         .timeline-item::before {
             content: '';
             position: absolute;
-            left: 1.2rem;
-            top: 2rem;
-            bottom: -1.5rem;
+            left: 1.125rem;
+            top: 1.75rem;
+            bottom: calc(-1.5rem - 1.75rem);
             width: 2px;
+            margin-left: -1px;
             background-color: #e5e7eb;
+            z-index: 0;
         }
         .timeline-item:last-child::before { display: none; }
         .timeline-icon {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 2.5rem;
-            height: 2.5rem;
+            position: relative;
+            z-index: 1;
+            justify-self: center;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
             color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            z-index: 10;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.18);
         }
         .timeline-hotel-icon {
+            width: 2rem;
+            height: 2rem;
+            margin-top: 0.75rem;
             background-color: #ef4444;
-            font-size: 1rem;
+            font-size: 0.9rem;
+        }
+        .timeline-card { min-width: 0; }
+        .stop-badge {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 9999px;
+            background: #1e3a8a;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            line-height: 1;
         }
         .chip-on-green { background:#16a34a; color:#fff; border-color:#15803d; box-shadow:0 2px 4px rgba(0,0,0,.12); }
         .chip-off-green { background:#fff; color:#15803d; border-color:#86efac; }
@@ -95,6 +119,7 @@
             z-index: 1;
             border: 1px solid #e5e7eb;
         }
+        .all-days-map { height: 340px; }
         .map-marker-num {
             background: #1e3a8a;
             color: #fff;
@@ -110,10 +135,60 @@
         }
         .leaflet-popup-content { margin: 10px 12px; font-size: 13px; line-height: 1.4; }
         .timeline-stop-dot {
-            width: 1rem;
-            height: 1rem;
-            left: 0.75rem;
-            top: 0.7rem;
+            width: 0.75rem;
+            height: 0.75rem;
+            margin-top: 1.375rem;
+        }
+        .settle-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(8.75rem, 1.35fr) minmax(0, 1fr);
+            align-items: center;
+            column-gap: 0.4rem;
+        }
+        .settle-from, .settle-to {
+            font-weight: 700;
+            color: #1f2937;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .settle-from { text-align: left; }
+        .settle-to { text-align: right; }
+        .settle-mid {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            min-height: 1.75rem;
+            white-space: nowrap;
+        }
+        .settle-pay {
+            font-size: 10px;
+            line-height: 1;
+            background: #bbf7d0;
+            color: #166534;
+            padding: 0.15rem 0.45rem;
+            border-radius: 9999px;
+        }
+        .settle-amt {
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: #15803d;
+        }
+        .map-marker-day {
+            box-sizing: border-box;
+            color: #fff;
+            border: 2px solid #fff;
+            border-radius: 9999px;
+            width: 48px;
+            height: 22px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: -0.03em;
+            box-shadow: 0 2px 6px rgba(0,0,0,.35);
         }
         .map-popup-actions {
             display: flex;
@@ -195,9 +270,7 @@
             onkeydown="if(event.key==='Enter')submitAppGate()"
             class="w-full p-3 border-2 border-gray-300 rounded-lg mb-2 focus:border-blue-600 focus:outline-none font-mono text-center tracking-widest text-lg">
         <p id="gate-error" class="text-red-500 text-xs font-bold mb-3 hidden">密碼不正確，請再試一次</p>
-        <button type="button" onclick="submitAppGate()" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 rounded-lg cursor-pointer shadow-md">
-            <i class="fa-solid fa-unlock mr-1.5"></i>進入行程
-        </button>
+        <button type="button" onclick="submitAppGate()" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 rounded-lg cursor-pointer shadow-md">點擊打開綠寶</button>
     </div>
 </div>
 
@@ -327,6 +400,14 @@ const dayTitles = {
     D3: 'Day 3 (本部町 / 婚禮)',
     D4: 'Day 4 (美國村 / 國際通)',
     D5: 'Day 5 (瀨長島 / 還車返回香港)'
+};
+
+const DAY_COLORS = {
+    D1: '#3b82f6',
+    D2: '#10b981',
+    D3: '#8b5cf6',
+    D4: '#f97316',
+    D5: '#ec4899'
 };
 
 let currentTab = 'ALL';
@@ -613,10 +694,11 @@ function placeActionButtonsHtml(pt, opts) {
         '<a href="' + nav + '" target="_blank" rel="noopener noreferrer" class="' + btnBase + ' bg-blue-50 hover:bg-blue-100 text-blue-600">' +
         '<i class="fa-solid fa-diamond-turn-right mr-1"></i> 導航</a>';
     if (showMap) {
+        const mapFn = (opts && opts.onAllMap) ? 'showAllStopOnMap' : 'showStopOnMap';
         const mapBtnClass = full
             ? 'col-span-2 inline-flex items-center justify-center font-medium py-2 px-3 rounded-lg transition-colors text-sm cursor-pointer bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-100'
             : 'self-start inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-100';
-        html += '<button type="button" onclick="showStopOnMap(\'' + day + '\',' + idx + ')" class="' + mapBtnClass + '">' +
+        html += '<button type="button" onclick="' + mapFn + '(\'' + day + '\',' + idx + ')" class="' + mapBtnClass + '">' +
             '<i class="fa-solid fa-map-location-dot mr-1"></i> 在地圖顯示</button>';
     }
     html += '</div>';
@@ -626,6 +708,7 @@ function placeActionButtonsHtml(pt, opts) {
 let dayMapInstance = null;
 let dayMapMarkers = [];
 let dayMapDayId = null;
+let allMapMarkers = Object.create(null);
 
 /** Display-only spiral offset so stacked identical coords stay visible. */
 function displayLatLng(pt, dupIndex) {
@@ -645,6 +728,76 @@ function destroyDayMap() {
     }
     dayMapMarkers = [];
     dayMapDayId = null;
+    allMapMarkers = Object.create(null);
+}
+
+function createTripMap(el) {
+    const map = L.map(el, {
+        scrollWheelZoom: false,
+        doubleClickZoom: true,
+        touchZoom: true
+    });
+    bindMapPinchGuard(map);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri',
+        maxZoom: 19
+    }).addTo(map);
+    return map;
+}
+
+function markerPopupHtml(pt, heading) {
+    const nav = getDirectionsLink(pt.lat, pt.lng);
+    const search = getGoogleSearchLink(pt);
+    const head = heading
+        ? '<div class="font-bold" style="color:' + heading.color + ';margin-bottom:2px">' + escapeHtml(heading.text) + '</div>'
+        : '';
+    return '<div>' + head +
+        '<div class="font-bold text-gray-800">' +
+        (pt.time ? '<span style="color:#4f46e5">' + escapeHtml(pt.time) + '</span> ' : '') +
+        escapeHtml(pt.title) +
+        '</div><div class="map-popup-actions">' +
+        '<a class="map-search-btn" href="' + search + '" target="_blank" rel="noopener noreferrer">' +
+        '<i class="fa-solid fa-magnifying-glass"></i> 詳細</a>' +
+        '<a class="map-nav-btn" href="' + nav + '" target="_blank" rel="noopener noreferrer">' +
+        '<i class="fa-solid fa-diamond-turn-right"></i> 導航</a></div></div>';
+}
+
+function placeMarkers(map, entries) {
+    const dupSeen = Object.create(null);
+    const bounds = [];
+    const byKey = Object.create(null);
+    entries.forEach(entry => {
+        const pt = entry.pt;
+        if (typeof pt.lat !== 'number' || typeof pt.lng !== 'number') return;
+        const coordKey = pt.lat.toFixed(6) + ',' + pt.lng.toFixed(6);
+        const dupIndex = dupSeen[coordKey] || 0;
+        dupSeen[coordKey] = dupIndex + 1;
+        const displayLL = displayLatLng(pt, dupIndex);
+        const icon = entry.kind === 'day'
+            ? L.divIcon({
+                className: '',
+                html: '<div class="map-marker-day" style="background:' + entry.color + '">' + escapeHtml(entry.label) + '</div>',
+                iconSize: [48, 22],
+                iconAnchor: [24, 11],
+                popupAnchor: [0, -12]
+            })
+            : L.divIcon({
+                className: '',
+                html: '<div class="map-marker-num">' + escapeHtml(entry.label) + '</div>',
+                iconSize: [28, 28],
+                iconAnchor: [14, 14],
+                popupAnchor: [0, -14]
+            });
+        const marker = L.marker(displayLL, { icon }).addTo(map);
+        const heading = entry.kind === 'day' ? { text: entry.label, color: entry.color } : null;
+        marker.bindPopup(markerPopupHtml(pt, heading));
+        if (entry.key != null) byKey[entry.key] = marker;
+        bounds.push(displayLL);
+    });
+    if (bounds.length === 1) map.setView(bounds[0], 14);
+    else if (bounds.length) map.fitBounds(bounds, { padding: [36, 36] });
+    setTimeout(() => { if (map) map.invalidateSize(); }, 80);
+    return byKey;
 }
 
 function initDayMap(dayId, points) {
@@ -656,58 +809,40 @@ function initDayMap(dayId, points) {
         el.innerHTML = '<div class="flex items-center justify-center h-full text-sm text-gray-500">暫無座標</div>';
         return;
     }
-    dayMapInstance = L.map(el, {
-        scrollWheelZoom: false,
-        doubleClickZoom: true,
-        touchZoom: true
-    });
-    bindMapPinchGuard(dayMapInstance);
+    dayMapInstance = createTripMap(el);
     dayMapDayId = dayId;
-    dayMapMarkers = new Array(points.length).fill(null);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri',
-        maxZoom: 19
-    }).addTo(dayMapInstance);
+    const byKey = placeMarkers(dayMapInstance, points.map((pt, idx) => ({
+        pt,
+        label: String(idx + 1),
+        kind: 'num',
+        key: String(idx)
+    })));
+    dayMapMarkers = points.map((_, idx) => byKey[String(idx)] || null);
+}
 
-    const dupSeen = Object.create(null);
-    const bounds = [];
-    points.forEach((pt, idx) => {
-        if (typeof pt.lat !== 'number' || typeof pt.lng !== 'number') return;
-        const key = pt.lat.toFixed(6) + ',' + pt.lng.toFixed(6);
-        const dupIndex = dupSeen[key] || 0;
-        dupSeen[key] = dupIndex + 1;
-        const n = idx + 1; // same as timeline blue badges (all stops incl. hotels)
-        const icon = L.divIcon({
-            className: '',
-            html: '<div class="map-marker-num">' + n + '</div>',
-            iconSize: [28, 28],
-            iconAnchor: [14, 14],
-            popupAnchor: [0, -14]
+function initAllDaysMap() {
+    destroyDayMap();
+    const el = document.getElementById('day-map-ALL');
+    if (!el || typeof L === 'undefined') return;
+    const stops = [];
+    ['D1', 'D2', 'D3', 'D4', 'D5'].forEach(day => {
+        itineraryData.filter(pt => pt.day === day).forEach((pt, idx) => {
+            stops.push({
+                pt,
+                label: day + '-' + (idx + 1),
+                color: DAY_COLORS[day] || '#1e3a8a',
+                kind: 'day',
+                key: day + ':' + idx
+            });
         });
-        // True coords for Google Maps nav/search; offset only for marker display
-        const nav = getDirectionsLink(pt.lat, pt.lng);
-        const search = getGoogleSearchLink(pt);
-        const popupHtml =
-            '<div><div class="font-bold text-gray-800">' +
-            (pt.time ? '<span style="color:#4f46e5">' + escapeHtml(pt.time) + '</span> ' : '') +
-            escapeHtml(pt.title) +
-            '</div><div class="map-popup-actions">' +
-            '<a class="map-search-btn" href="' + search + '" target="_blank" rel="noopener noreferrer">' +
-            '<i class="fa-solid fa-magnifying-glass"></i> 詳細</a>' +
-            '<a class="map-nav-btn" href="' + nav + '" target="_blank" rel="noopener noreferrer">' +
-            '<i class="fa-solid fa-diamond-turn-right"></i> 導航</a></div></div>';
-        const displayLL = displayLatLng(pt, dupIndex);
-        const marker = L.marker(displayLL, { icon }).addTo(dayMapInstance);
-        marker.bindPopup(popupHtml);
-        dayMapMarkers[idx] = marker;
-        bounds.push(displayLL);
     });
-    if (bounds.length === 1) {
-        dayMapInstance.setView(bounds[0], 14);
-    } else {
-        dayMapInstance.fitBounds(bounds, { padding: [36, 36] });
+    if (!stops.some(s => typeof s.pt.lat === 'number' && typeof s.pt.lng === 'number')) {
+        el.innerHTML = '<div class="flex items-center justify-center h-full text-sm text-gray-500">暫無座標</div>';
+        return;
     }
-    setTimeout(() => { if (dayMapInstance) dayMapInstance.invalidateSize(); }, 80);
+    dayMapInstance = createTripMap(el);
+    dayMapDayId = 'ALL';
+    allMapMarkers = placeMarkers(dayMapInstance, stops);
 }
 
 /** Pinch zooms the map in and out. A single finger is left for page scroll. */
@@ -733,19 +868,19 @@ function bindMapPinchGuard(map) {
     });
 }
 
+function focusMapMarker(map, marker, mapEl) {
+    if (mapEl) mapEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!marker || !map) return;
+    const ll = marker.getLatLng();
+    const z = Math.max(map.getZoom() || 13, 14);
+    map.setView(ll, z);
+    marker.openPopup();
+    setTimeout(() => { if (map) map.invalidateSize(); }, 100);
+}
+
 function showStopOnMap(day, idx) {
     const open = () => {
-        const mapEl = document.getElementById('day-map-' + day);
-        if (mapEl) {
-            mapEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-        const marker = dayMapMarkers[idx];
-        if (!marker || !dayMapInstance) return;
-        const ll = marker.getLatLng();
-        const z = Math.max(dayMapInstance.getZoom() || 13, 14);
-        dayMapInstance.setView(ll, z);
-        marker.openPopup();
-        setTimeout(() => { if (dayMapInstance) dayMapInstance.invalidateSize(); }, 100);
+        focusMapMarker(dayMapInstance, dayMapMarkers[idx], document.getElementById('day-map-' + day));
     };
     if (currentTab !== day) {
         switchTab(day);
@@ -755,6 +890,11 @@ function showStopOnMap(day, idx) {
     }
 }
 window.showStopOnMap = showStopOnMap;
+
+function showAllStopOnMap(day, idx) {
+    focusMapMarker(dayMapInstance, allMapMarkers[day + ':' + idx], document.getElementById('day-map-ALL'));
+}
+window.showAllStopOnMap = showAllStopOnMap;
 
 function switchTab(tab) {
     currentTab = tab;
@@ -811,6 +951,54 @@ function executeOpenAudit() {
 }
 function closeAuditModal() { document.getElementById('audit-modal').style.display = 'none'; }
 
+function handbookSearchHtml() {
+    const regions = [
+        {
+            title: '北部',
+            items: [
+                ['沖繩美麗海水族館', '查開館時間、當日表演與交通。', '沖繩美麗海水族館'],
+                ['海洋博公園', '查園區範圍與周邊設施。', '海洋博公園 沖繩'],
+                ['古宇利島', '查大橋路況、海灘與停車場。', '古宇利島'],
+                ['備瀨福木林', '查步行路線與開放情況。', '備瀨福木林'],
+                ['今歸仁城跡', '查參觀時間與交通。', '今歸仁城跡']
+            ]
+        },
+        {
+            title: '中部',
+            items: [
+                ['萬座毛', '查步道、展望位置與停車場。', '萬座毛 沖繩'],
+                ['真榮田岬（青之洞窟）', '查浮潛店家、場次與海況。', '真榮田岬 青之洞窟'],
+                ['殘波岬燈塔', '查開放時間與斷崖步道。', '殘波岬燈塔'],
+                ['美國村', '查停車場、商店與日落位置。', '美國村 沖繩'],
+                ['AEON Mall 沖繩 Rycom', '查營業時間與手信店。', 'AEON Mall Okinawa Rycom']
+            ]
+        },
+        {
+            title: '南部',
+            items: [
+                ['首里城', '查參觀時間與城跡開放範圍。', '首里城'],
+                ['國際通', '查商店街範圍、屋台村與交通。', '國際通 那霸'],
+                ['瀨長島 Umikaji Terrace', '查停車場與飛機觀賞位置。', '瀨長島 Umikaji Terrace'],
+                ['波上宮', '查參拜時間與海邊位置。', '波上宮 那霸'],
+                ['那霸機場', '查航班動態與租車接駁。', '那霸機場']
+            ]
+        }
+    ];
+    const blocks = regions.map(region => {
+        const lis = region.items.map(([name, note, query]) => {
+            const href = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+            return '<li><a href="' + href + '" target="_blank" rel="noopener noreferrer" class="font-medium text-teal-900 underline">' +
+                escapeHtml(name) + '</a>：' + escapeHtml(note) + '</li>';
+        }).join('');
+        return '<div class="mt-3"><h4 class="font-bold text-teal-950 mb-1">' + escapeHtml(region.title) + '</h4>' +
+            '<ul class="list-disc pl-5 text-sm text-gray-700 space-y-1.5">' + lis + '</ul></div>';
+    }).join('');
+    return '<div class="bg-teal-50 p-4 rounded-lg border border-teal-100">' +
+        '<h3 class="font-bold text-teal-950 mb-1"><i class="fa-solid fa-magnifying-glass mr-2"></i>網上搜尋資料</h3>' +
+        '<p class="text-sm text-gray-600">以下地點可於出發前或路上查閱開放時間、交通與現場情況。</p>' +
+        blocks + '</div>';
+}
+
 function renderContent(tab) {
     const sidebar = document.getElementById('sidebar-content');
     destroyDayMap();
@@ -824,66 +1012,60 @@ function renderContent(tab) {
                 <h2 class="text-2xl font-bold mb-4 text-blue-800"><i class="fa-solid fa-book-open mr-2"></i>行車及求生手冊</h2>
                 <div class="space-y-4">
                     <div class="bg-sky-50 p-4 rounded-lg border border-sky-100">
-                        <h3 class="font-bold text-sky-900 mb-2"><i class="fa-solid fa-plane mr-2"></i>航班資料（大灣區航空）</h3>
+                        <h3 class="font-bold text-sky-900 mb-2"><i class="fa-solid fa-plane mr-2"></i>航班</h3>
                         <ul class="list-disc pl-5 text-sm text-gray-700 space-y-2">
-                            <li><b>去程 11/11</b>：HB336　香港 HKG 09:45 → 沖繩 OKA 13:10（約 2 小時 25 分）　機型波音 73A　票價「好想飛 (U)」　行李 20KG</li>
-                            <li><b>回程 15/11</b>：HB337　沖繩 OKA 14:10 → 香港 HKG 16:05（約 2 小時 55 分）　機型波音 73A　票價「好想飛 (T)」　行李 20KG</li>
-                            <li>去程抵達後約 14:30 取車；回程 11:30 還車（預留加油、接駁及過關）。</li>
+                            <li><b>去程 11/11</b>：HB336（大灣區航空）。香港國際機場 09:45 起飛 → 那霸機場 13:10 抵達。託運行李 20 公斤。</li>
+                            <li><b>回程 15/11</b>：HB337（大灣區航空）。那霸機場 14:10 起飛 → 香港國際機場 16:05 抵達。託運行李 20 公斤。</li>
+                            <li>去程抵達後約 14:30 取車。回程 11:30 還車，請預留加油、接駁及過關時間。</li>
                         </ul>
                     </div>
                     <div class="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
-                        <h3 class="font-bold text-emerald-900 mb-2"><i class="fa-solid fa-hotel mr-2"></i>住宿確認（Trip.com）</h3>
+                        <h3 class="font-bold text-emerald-900 mb-2"><i class="fa-solid fa-hotel mr-2"></i>住宿</h3>
                         <ul class="list-disc pl-5 text-sm text-gray-700 space-y-3">
                             <li>
-                                <b>グランディオーソ沖縄プールヴィラ恩納 7／沖繩豪華泳池別墅恩納 7</b><br>
-                                11/11 16:00–23:00 入住 → 13/11 10:00 前退房（2 晚）・至尊沖繩泳池別墅恩納 7d・可住 12 人・無餐<br>
-                                〒904-0402 沖縄県国頭郡恩納村安富祖 1854-7・約距那霸機場 43 km・電話 +81-50-3138-6036<br>
-                                訂單 <b>1578951053121146</b>・PIN <b>1480</b>・已付 HK$1,975.46<br>
-                                取消：11/3 18:00（酒店當地）後取消費 HK$987.73・特別要求：需要泊車位；BBQ 未定日期
+                                <b>グランディオーソ沖縄プールヴィラ恩納 7（沖繩豪華泳池別墅恩納 7）</b><br>
+                                11/11 16:00–23:00 入住，13/11 10:00 前退房。<br>
+                                〒904-0402 沖縄県国頭郡恩納村安富祖 1854-7。電話 +81-50-3138-6036。<br>
+                                辦理入住請出示訂單 <b>1578951053121146</b>、PIN <b>1480</b>。住客可使用附設停車位。不含早餐。
                             </li>
                             <li>
                                 <b>Hotel Mahaina Wellness Resorts Okinawa（沖繩馬海納健康度假酒店）</b><br>
-                                13/11 15:00 後入住 → 14/11 11:00 前退房（1 晚）・1 房・無餐<br>
-                                〒905-0205 沖縄県国頭郡本部町山川 1456・電話 +81-980-51-7700<br>
-                                訂單 <b>1578950516629519</b>・PIN <b>7633</b>・已付 HK$1,211.45（Mastercard ****9524，11/5 已扣）<br>
-                                免費取消至 11/7 23:59（酒店當地）
+                                13/11 15:00 後入住，14/11 11:00 前退房。<br>
+                                〒905-0205 沖縄県国頭郡本部町山川 1456。電話 +81-980-51-7700。<br>
+                                辦理入住請出示訂單 <b>1578950516629519</b>、PIN <b>7633</b>。婚禮當日約 14:05 可先寄存行李。不含早餐。
                             </li>
                             <li>
-                                <b>INFINISIS NAHA SHURIJO by 休伊特度假村</b><br>
-                                14/11 15:00 後入住 → 15/11 11:00 前退房（1 晚）・豪華雙床房・可住 4 人・約 34 m²・無餐<br>
-                                〒902-0062 沖縄県那覇市松川 40・電話 +81-98-887-1111<br>
-                                訂單 <b>1578951053182664</b>・PIN <b>5143</b>・應付 HK$890.12（Mastercard ****9524，酒店當地 11/12 扣款）<br>
-                                免費取消至 11/13 23:59（酒店當地）
+                                <b>INFINISIS NAHA SHURIJO</b><br>
+                                14/11 15:00 後入住，15/11 11:00 前退房。<br>
+                                〒902-0062 沖縄県那覇市松川 40。電話 +81-98-887-1111。<br>
+                                辦理入住請出示訂單 <b>1578951053182664</b>、PIN <b>5143</b>。不含早餐。
                             </li>
                         </ul>
                     </div>
                     <div class="bg-violet-50 p-4 rounded-lg border border-violet-100">
-                        <h3 class="font-bold text-violet-900 mb-2"><i class="fa-solid fa-key mr-2"></i>租車（已訂 Clover）</h3>
+                        <h3 class="font-bold text-violet-900 mb-2"><i class="fa-solid fa-key mr-2"></i>租車（Clover）</h3>
                         <ul class="list-disc pl-5 text-sm text-gray-700 space-y-2">
-                            <li><b>供應商</b>：Clover（Trip.com.hk）— Toyota Voxy 或類似</li>
-                            <li><b>訂單</b>：<b>1688902392366643</b>・PIN <b>7595</b>（取車用，請勿外傳）・<a href="https://hk.trip.com/carhire/order/1688902392366643" target="_blank" rel="noopener" class="text-violet-700 underline">訂單頁</a></li>
-                            <li><b>已付</b>：HK$1,661.19（租金 HK$1,144.19 ＋ 高級／零自負額 HK$517）</li>
-                            <li><b>取車</b>：11/11 <b>14:30</b>　那霸機場 Clover 櫃台（沖縄県豊見城市豊見城 361-2）；免費接駁約 15 分鐘</li>
-                            <li><b>還車</b>：15/11 <b>11:30</b>　同一櫃台；還車前加滿油並保留收據</li>
-                            <li><b>司機</b>：LI TSZ WING・航班 HB336</li>
-                            <li><b>免費取消</b>：至 6/11 14:30（當地）</li>
+                            <li><b>車款</b>：Toyota Voxy 或同級車。司機 LI TSZ WING，航班 HB336。</li>
+                            <li><b>取車憑證</b>：訂單 <b>1688902392366643</b>、PIN <b>7595</b>。<a href="https://hk.trip.com/carhire/order/1688902392366643" target="_blank" rel="noopener" class="text-violet-800 underline">開啟訂單</a></li>
+                            <li><b>取車</b>：11/11 <b>14:30</b>　那霸機場 Clover 櫃台（沖縄県豊見城市豊見城 361-2）。免費接駁約 15 分鐘。</li>
+                            <li><b>還車</b>：15/11 <b>11:30</b>　同一櫃台。還車前加滿油，並保留收據。</li>
                         </ul>
                     </div>
                     <div class="bg-blue-50 p-4 rounded-lg">
                         <h3 class="font-bold text-blue-900 mb-2"><i class="fa-solid fa-car-side mr-2"></i>自駕注意事項</h3>
                         <ul class="list-disc pl-5 text-sm text-gray-700 space-y-2">
-                            <li><b>靠左行駛</b>：日本為右駕左行，時刻提醒司機「左邊、左邊」。轉彎口訣「左轉轉小彎，右轉轉大彎」。</li>
-                            <li><b>「止まれ」(TOMARE) 標誌</b>：遇到紅色倒三角形標誌，必須<b>完全停車 3 秒</b>，確認左右無車後才可駛出。警察最常取締！</li>
-                            <li><b>加油與還車</b>：還車前必須加滿油，保留最後一張加油收據。通常加 Regular（紅色油槍）。</li>
-                            <li><b>泊車</b>：切勿違例泊車，罰款極高。請使用收費停車場。</li>
+                            <li><b>靠左行駛</b>：日本為右駕左行。轉彎時記住「左轉轉小彎，右轉轉大彎」。</li>
+                            <li><b>「止まれ」(TOMARE) 標誌</b>：紅色倒三角形。必須<b>完全停車約 3 秒</b>，確認左右無車後才可駛出。</li>
+                            <li><b>加油與還車</b>：還車前加滿油，保留最後一張收據。一般加 Regular（紅色油槍）。</li>
+                            <li><b>泊車</b>：使用收費或指定停車場，避免違例泊車。</li>
                         </ul>
                     </div>
                     <div class="bg-amber-50 p-4 rounded-lg">
                         <h3 class="font-bold text-amber-900 mb-2"><i class="fa-solid fa-road mr-2"></i>高速公路／ETC</h3>
                         <ul class="list-disc pl-5 text-sm text-gray-700 space-y-2">
-                            <li>沖繩有限速公路／收費路段；租車時可詢問櫃台是否有 <b>ETC 卡</b>，過閘不必停車。</li>
-                            <li>若沒有 ETC，請使用現金或信用卡閘口；保留收據以便日後記帳。</li>
-                            <li>長途（恩納 ↔ 那霸／機場）可考慮行駛快速道路以節省時間，費用可記入「高速公路費」。</li>
+                            <li>沖繩自動車道為收費道路。取車時可向櫃台查詢是否附有 <b>ETC 卡</b>；有卡即可過閘，不必停車。</li>
+                            <li>若沒有 ETC，請走現金或信用卡閘口，並保留收據。</li>
+                            <li>恩納往返那霸或機場，可走自動車道以節省時間。</li>
                         </ul>
                     </div>
                     <div class="bg-red-50 p-4 rounded-lg">
@@ -891,23 +1073,40 @@ function renderContent(tab) {
                         <ul class="list-disc pl-5 text-sm text-gray-700 space-y-2">
                             <li><b>110</b>：警察</li>
                             <li><b>119</b>：消防／救護</li>
-                            <li>酒店前台／租車公司緊急聯絡：入住或取車時拍下名片或 WhatsApp。</li>
+                            <li>入住或取車時，拍下酒店前台及租車公司的緊急聯絡。</li>
                         </ul>
                     </div>
                     <div class="bg-purple-50 p-4 rounded-lg">
-                        <h3 class="font-bold text-purple-900 mb-2"><i class="fa-solid fa-ring mr-2"></i>婚禮準備清單</h3>
+                        <h3 class="font-bold text-purple-900 mb-2"><i class="fa-solid fa-ring mr-2"></i>婚禮當日</h3>
                         <ul class="list-disc pl-5 text-sm text-gray-700 space-y-2">
-                            <li><b>服裝準備</b>：西裝 / 禮服、領帶、皮鞋及<b>深色襪子</b>。</li>
-                            <li><b>宴會必備</b>：解酒藥（薑黃之力等，便利店有售）。</li>
+                            <li><b>服裝</b>：西裝或禮服、領帶、皮鞋，以及<b>深色襪子</b>。</li>
+                            <li><b>宴會</b>：可在便利店購買解酒藥（例如薑黃之力）。</li>
                         </ul>
                     </div>
+                    ${handbookSearchHtml()}
                 </div>
             </div>`;
         return;
     }
 
     if (tab === 'ALL') {
+        const legend = ['D1', 'D2', 'D3', 'D4', 'D5'].map(d =>
+            '<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-gray-700">' +
+            '<span class="inline-block w-2.5 h-2.5 rounded-full" style="background:' + DAY_COLORS[d] + '"></span>' +
+            escapeHtml(d) + '</span>'
+        ).join('');
         let allHtml = '<div class="w-full space-y-6 pb-12">';
+        allHtml += `
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-4 py-2 border-b border-gray-100">
+                    <div class="flex items-center justify-between gap-2">
+                        <h3 class="font-bold text-sm text-blue-900"><i class="fa-solid fa-map-location-dot mr-1.5"></i>全程地圖</h3>
+                        <span class="text-[10px] text-gray-400 text-right">標記為 D日-站，例如 D2-3</span>
+                    </div>
+                    <div class="flex flex-wrap gap-x-3 gap-y-1 mt-2">${legend}</div>
+                </div>
+                <div id="day-map-ALL" class="day-map all-days-map"></div>
+            </div>`;
         ['D1','D2','D3','D4','D5'].forEach(d => {
             const dayPoints = itineraryData.filter(pt => pt.day === d);
             allHtml += `
@@ -922,13 +1121,14 @@ function renderContent(tab) {
                     <li class="flex flex-col border-b border-gray-50 pb-3 gap-1">
                         <div class="font-semibold text-gray-800 text-base"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-900 text-white text-[10px] font-bold mr-1.5 align-middle">${idx + 1}</span>${pt.time ? `<span class="text-indigo-600 font-bold mr-2">${escapeHtml(pt.time)}</span>` : ''}${pt.isHotel ? '🏠 ' : ''}${escapeHtml(pt.title)}</div>
                         <div class="text-xs text-gray-500 mb-1">${escapeHtml(pt.desc)}</div>
-                        ${placeActionButtonsHtml(pt, { day: d, idx })}
+                        ${placeActionButtonsHtml(pt, { day: d, idx, onAllMap: true })}
                     </li>`;
             });
             allHtml += '</ul></div>';
         });
         allHtml += '</div>';
         sidebar.innerHTML = allHtml;
+        initAllDaysMap();
         return;
     }
 
@@ -951,10 +1151,10 @@ function renderContent(tab) {
                 <div class="timeline-icon ${iconClass}" style="${!pt.isHotel ? 'background-color:' + pt.color : ''}">
                     ${iconHtml}
                 </div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <div class="timeline-card bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                     <div class="flex items-start gap-2 mb-1">
-                        <span class="shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-900 text-white text-xs font-bold">${mapNum}</span>
-                        <h3 class="font-bold text-lg text-gray-800">${pt.time ? `<span class="inline-block bg-indigo-100 text-indigo-700 text-sm font-bold px-2 py-0.5 rounded mr-2">${escapeHtml(pt.time)}</span>` : ''}${escapeHtml(pt.title)}</h3>
+                        <span class="stop-badge">${mapNum}</span>
+                        <h3 class="font-bold text-lg text-gray-800 min-w-0">${pt.time ? `<span class="inline-block bg-indigo-100 text-indigo-700 text-sm font-bold px-2 py-0.5 rounded mr-2">${escapeHtml(pt.time)}</span>` : ''}${escapeHtml(pt.title)}</h3>
                     </div>
                     <p class="text-sm text-gray-600 mb-3">${escapeHtml(pt.desc)}</p>
                     <div class="grid grid-cols-2 gap-2 text-xs text-gray-500 mb-3 bg-gray-50 p-2 rounded-lg">
@@ -1231,14 +1431,14 @@ function renderAccounting() {
                 <div class="border-t-2 border-blue-200 pt-4">
                     <h4 class="font-bold text-gray-800 mb-3 bg-yellow-100 inline-block px-2 py-1 rounded">最終結算清單</h4>
                     ${transfers.map(t => `
-                        <div class="flex items-center justify-between bg-green-50 p-3 rounded-lg border border-green-200 mb-2 shadow-sm">
-                            <div class="font-bold text-gray-800">${escapeHtml(t.from)}</div>
-                            <div class="flex flex-col items-center text-green-600 px-4">
-                                <span class="text-[10px] bg-green-200 text-green-800 px-2 rounded-full mb-1">付款</span>
-                                <i class="fa-solid fa-arrow-right"></i>
-                                <span class="font-bold text-sm mt-1">HKD ${t.amount.toFixed(1)}</span>
+                        <div class="settle-row bg-green-50 p-3 rounded-lg border border-green-200 mb-2 shadow-sm">
+                            <div class="settle-from">${escapeHtml(t.from)}</div>
+                            <div class="settle-mid">
+                                <span class="settle-pay">付款</span>
+                                <i class="fa-solid fa-arrow-right text-green-600"></i>
+                                <span class="settle-amt">HKD ${t.amount.toFixed(1)}</span>
                             </div>
-                            <div class="font-bold text-gray-800">${escapeHtml(t.to)}</div>
+                            <div class="settle-to">${escapeHtml(t.to)}</div>
                         </div>
                     `).join('') || '<div class="text-center text-gray-400 py-2">目前沒有欠款，帳目已結清！</div>'}
                 </div>
