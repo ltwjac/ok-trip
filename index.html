@@ -9,9 +9,11 @@
     <meta name="apple-mobile-web-app-title" content="沖繩之旅">
     <meta name="mobile-web-app-capable" content="yes">
     <title>綠林快槍手沖繩之旅</title>
-    <link rel="manifest" href='data:application/manifest+json,{"name":"%E7%B6%A0%E6%9E%97%E5%BF%AB%E6%A7%8D%E6%89%8B%E6%B2%96%E7%B9%A9%E4%B9%8B%E6%97%85","short_name":"%E6%B2%96%E7%B9%A9%E4%B9%8B%E6%97%85","start_url":".","display":"standalone","background_color":"#1e3a8a","theme_color":"#1e3a8a","lang":"zh-HK"}'>
+    <link rel="manifest" href='data:application/manifest+json,{"name":"%E7%B6%A0%E6%9E%97%E5%BF%AB%E6%A7%8D%E6%89%8B%E6%B2%96%E7%B9%A9%E4%B9%8B%E6%97%85","short_name":"%E6%B2%96%E7%B9%A9%E4%B9%8B%E6%97%85","start_url":".","display":"standalone","background_color":"%231e3a8a","theme_color":"%231e3a8a","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%87%AF%F0%9F%87%B5%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <style>
         body {
             font-family: 'Inter', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
@@ -85,6 +87,49 @@
         .chip-off-red { background:#fff; color:#b91c1c; border-color:#fca5a5; }
         .chip-on-indigo { background:#4f46e5; color:#fff; border-color:#4338ca; }
         .chip-off-indigo { background:#fff; color:#4f46e5; border-color:#c7d2fe; }
+
+        .day-map {
+            height: 280px;
+            width: 100%;
+            border-radius: 0.75rem;
+            z-index: 1;
+            border: 1px solid #e5e7eb;
+        }
+        .map-marker-num {
+            background: #1e3a8a;
+            color: #fff;
+            border: 2px solid #fff;
+            border-radius: 9999px;
+            width: 28px;
+            height: 28px;
+            line-height: 24px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 13px;
+            box-shadow: 0 2px 6px rgba(0,0,0,.35);
+        }
+        .leaflet-popup-content { margin: 10px 12px; font-size: 13px; line-height: 1.4; }
+        .map-popup-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.55rem;
+        }
+        .map-nav-btn, .map-search-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: #2563eb;
+            color: #fff !important;
+            padding: 0.4rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none !important;
+        }
+        .map-nav-btn:hover { background: #1d4ed8; }
+        .map-search-btn { background: #059669; }
+        .map-search-btn:hover { background: #047857; }
     </style>
 </head>
 <body>
@@ -109,6 +154,23 @@
     </header>
     <div class="content-wrapper">
         <div class="scroll-section max-w-2xl mx-auto w-full" id="sidebar-content"></div>
+    </div>
+</div>
+
+
+<!-- App unlock gate -->
+<div id="app-gate" class="fixed inset-0 bg-blue-950/95 z-[100] flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full text-center">
+        <div class="text-4xl mb-3">🇯🇵</div>
+        <h2 class="text-xl font-bold text-blue-900 mb-1">綠林快槍手沖繩之旅</h2>
+        <p class="text-sm text-gray-600 mb-4">請輸入<strong>綠林快槍手密碼</strong>先入去睇行程</p>
+        <input type="password" id="gate-input" inputmode="numeric" autocomplete="off" placeholder="輸入密碼"
+            onkeydown="if(event.key==='Enter')submitAppGate()"
+            class="w-full p-3 border-2 border-gray-300 rounded-lg mb-2 focus:border-blue-600 focus:outline-none font-mono text-center tracking-widest text-lg">
+        <p id="gate-error" class="text-red-500 text-xs font-bold mb-3 hidden">密碼唔啱，再試一次啦</p>
+        <button type="button" onclick="submitAppGate()" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 rounded-lg cursor-pointer shadow-md">
+            <i class="fa-solid fa-unlock mr-1.5"></i>進入行程
+        </button>
     </div>
 </div>
 
@@ -198,38 +260,38 @@ const commonExpensePresets = ['早餐', '午餐', '晚餐', '油費', '高速公
 const AUDIT_PASS_HASH = '3afddfdd432759f906ff30983fbecfd56b022e56433b598d2b04e3193c641659';
 
 const itineraryData = [
-    { day: 'D1', time: '13:10', title: 'HB336 抵達那霸機場', isHotel: false, color: '#3b82f6', travelTime: '落地', parking: '機場', desc: '香港 09:45 起飛 → 沖繩 13:10 抵達。過關拎行李後去 Clover 接駁點。', searchQuery: '那霸機場' },
-    { day: 'D1', time: '14:30', title: 'Clover 借車（Voxy 或類似）', isHotel: false, color: '#3b82f6', travelTime: '接駁約 15分鐘', parking: 'Clover 停車場', desc: '訂單取車 14:30（HB336 落地後過關＋接駁）。檢查車況、保險、入油規矩；導航用電話即可。', searchQuery: '那霸機場 租車 Clover' },
-    { day: 'D1', time: '16:00', title: '殘波岬燈塔 & 壯麗斷崖', isHotel: false, color: '#3b82f6', travelTime: '約 70–80分鐘', parking: '免費停車場', desc: '機場周邊北上約 70–80 分（一般道／高速相近）。短停燈塔同斷崖打卡（約 35–40 分鐘）。', searchQuery: '殘波岬燈塔 沖繩' },
-    { day: 'D1', time: '17:00', title: '浜の家海鮮食堂 遲午餐', isHotel: false, color: '#3b82f6', travelTime: '約 20分鐘', parking: '餐廳專屬停車場 (免費)', desc: '殘波→仲泊約 20 分。當地新鮮海產，奶油烤魚必試。', searchQuery: '浜の家海鮮食堂 恩納村' },
-    { day: 'D1', time: '18:30', title: 'グランディオーソ沖縄プールヴィラ恩納 7D 入住', isHotel: true, color: '#ef4444', travelTime: '約 20分鐘', parking: '住宿附設停車位', desc: '〒904-0402 恩納村安富祖1854-7。Trip.com 訂單 1578951053121146／PIN 1480；16:00–23:00 入住。午餐後北上安富祖約 20 分。', searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
-    { day: 'D1', time: '19:00', title: '恩納村海灘／別墅休整', isHotel: false, color: '#3b82f6', travelTime: '約 5分鐘', parking: '海灘公共停車場', desc: '11 月日落早；入住後短散步／泳池休整，再出發食晚餐。', searchQuery: '恩納村 海灘' },
-    { day: 'D1', time: '19:45', title: '琉球之牛 (恩納店) 晚餐', isHotel: false, color: '#3b82f6', travelTime: '約 10分鐘', parking: '餐廳專屬/附近收費停車場', desc: '頂級沖繩和牛燒肉，第一日完結。建議預留位。', searchQuery: '琉球之牛 恩納店' },
+    { day: 'D1', time: '13:10', title: 'HB336 抵達那霸機場', isHotel: false, color: '#3b82f6', travelTime: '落地', parking: '機場', desc: '香港 09:45 起飛 → 沖繩 13:10 抵達。過關拎行李後去 Clover 接駁點。', lat: 26.2065, lng: 127.6465, searchQuery: '那霸機場' },
+    { day: 'D1', time: '14:30', title: 'Clover 借車（Voxy 或類似）', isHotel: false, color: '#3b82f6', travelTime: '接駁約 15分鐘', parking: 'Clover 停車場', desc: '訂單取車 14:30（HB336 落地後過關＋接駁）。檢查車況、保險、入油規矩；導航用電話即可。', lat: 26.1838, lng: 127.6655, searchQuery: '那霸機場 租車 Clover' },
+    { day: 'D1', time: '16:00', title: '殘波岬燈塔 & 壯麗斷崖', isHotel: false, color: '#3b82f6', travelTime: '約 70–80分鐘', parking: '免費停車場', desc: '機場周邊北上約 70–80 分（一般道／高速相近）。短停燈塔同斷崖打卡（約 35–40 分鐘）。', lat: 26.4411, lng: 127.7125, searchQuery: '殘波岬燈塔 沖繩' },
+    { day: 'D1', time: '17:00', title: '浜の家海鮮食堂 遲午餐', isHotel: false, color: '#3b82f6', travelTime: '約 20分鐘', parking: '餐廳專屬停車場 (免費)', desc: '殘波→仲泊約 20 分。當地新鮮海產，奶油烤魚必試。', lat: 26.4358, lng: 127.7922, searchQuery: '浜の家海鮮食堂 恩納村' },
+    { day: 'D1', time: '18:30', title: 'グランディオーソ沖縄プールヴィラ恩納 7D 入住', isHotel: true, color: '#ef4444', travelTime: '約 20分鐘', parking: '住宿附設停車位', desc: '〒904-0402 恩納村安富祖1854-7。Trip.com 訂單 1578951053121146／PIN 1480；16:00–23:00 入住。午餐後北上安富祖約 20 分。', lat: 26.5125, lng: 127.9005, searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
+    { day: 'D1', time: '19:00', title: '恩納村海灘／別墅休整', isHotel: false, color: '#3b82f6', travelTime: '約 5分鐘', parking: '海灘公共停車場', desc: '11 月日落早；入住後短散步／泳池休整，再出發食晚餐。', lat: 26.511, lng: 127.8975, searchQuery: '恩納村 海灘' },
+    { day: 'D1', time: '19:45', title: '琉球之牛 (恩納店) 晚餐', isHotel: false, color: '#3b82f6', travelTime: '約 10分鐘', parking: '餐廳專屬/附近收費停車場', desc: '頂級沖繩和牛燒肉，第一日完結。建議預留位。', lat: 26.4469, lng: 127.8042, searchQuery: '琉球之牛 恩納店' },
 
-    { day: 'D2', time: '09:00', title: '別墅出發', isHotel: true, color: '#10b981', travelTime: '起點', parking: '住宿附設停車位', desc: '早上集合出發。', searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
-    { day: 'D2', time: '09:30', title: '青之洞窟 (真榮田岬) 浮潛', isHotel: false, color: '#10b981', travelTime: '約 20–25分鐘', parking: '真榮田岬收費停車場', desc: '安富祖→真榮田約 20–25 分。09:30–11:30 藍洞浮潛。旺季建議預早預約店家。', searchQuery: '真榮田岬 青之洞窟' },
-    { day: 'D2', time: '12:00', title: '恩納村阿古豬涮涮鍋 午餐', isHotel: false, color: '#10b981', travelTime: '約 15分鐘', parking: '餐廳提供', desc: '真榮田返恩納午餐約 15 分；約 13:00 前出發去 SUP。', searchQuery: '恩納村 阿古豬' },
-    { day: 'D2', time: '14:00', title: '恩納村 SUP', isHotel: false, color: '#10b981', travelTime: '約 10–20分鐘', parking: '店家／海灘停車場', desc: '午餐後恩納海岸 SUP（約 60–90 分）。11 月視天氣同店家場次；建議預早訂。唔使北上。', searchQuery: '恩納村 SUP' },
-    { day: 'D2', time: '17:00', title: '返別墅休整', isHotel: false, color: '#10b981', travelTime: '約 10–15分鐘', parking: '別墅停車', desc: 'SUP 後返別墅（近）。沖涼、買 BBQ 食材／啤酒。', searchQuery: '恩納村 超市' },
-    { day: 'D2', time: '19:00', title: '別墅 BBQ 晚餐', isHotel: false, color: '#10b981', travelTime: '原地', parking: '別墅停車', desc: '兄弟 BBQ，痛快暢飲。', searchQuery: '恩納村 BBQ' },
+    { day: 'D2', time: '09:00', title: '別墅出發', isHotel: true, color: '#10b981', travelTime: '起點', parking: '住宿附設停車位', desc: '早上集合出發。', lat: 26.5125, lng: 127.9005, searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
+    { day: 'D2', time: '09:30', title: '青之洞窟 (真榮田岬) 浮潛', isHotel: false, color: '#10b981', travelTime: '約 20–25分鐘', parking: '真榮田岬收費停車場', desc: '安富祖→真榮田約 20–25 分。09:30–11:30 藍洞浮潛。旺季建議預早預約店家。', lat: 26.4447, lng: 127.7724, searchQuery: '真榮田岬 青之洞窟' },
+    { day: 'D2', time: '12:00', title: '恩納村阿古豬涮涮鍋 午餐', isHotel: false, color: '#10b981', travelTime: '約 15分鐘', parking: '餐廳提供', desc: '真榮田返恩納午餐約 15 分；約 13:00 前出發去 SUP。', lat: 26.455, lng: 127.81, searchQuery: '恩納村 阿古豬' },
+    { day: 'D2', time: '14:00', title: '恩納村 SUP', isHotel: false, color: '#10b981', travelTime: '約 10–20分鐘', parking: '店家／海灘停車場', desc: '午餐後恩納海岸 SUP（約 60–90 分）。11 月視天氣同店家場次；建議預早訂。唔使北上。', lat: 26.49, lng: 127.855, searchQuery: '恩納村 SUP' },
+    { day: 'D2', time: '17:00', title: '返別墅休整', isHotel: false, color: '#10b981', travelTime: '約 10–15分鐘', parking: '別墅停車', desc: 'SUP 後返別墅（近）。沖涼、買 BBQ 食材／啤酒。', lat: 26.5125, lng: 127.9005, searchQuery: '恩納村 超市' },
+    { day: 'D2', time: '19:00', title: '別墅 BBQ 晚餐', isHotel: false, color: '#10b981', travelTime: '原地', parking: '別墅停車', desc: '兄弟 BBQ，痛快暢飲。', lat: 26.5125, lng: 127.9005, searchQuery: '恩納村 BBQ' },
 
-    { day: 'D3', time: '09:30', title: '別墅退房出發', isHotel: true, color: '#8b5cf6', travelTime: '起點', parking: '住宿附設停車位', desc: '10:00 前退房。收拾行李，告別恩納村基地。', searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
-    { day: 'D3', time: '11:00', title: '本部町 午餐 (燒肉/海邦丸)', isHotel: false, color: '#8b5cf6', travelTime: '約 45–55分鐘', parking: '周邊停車場', desc: '安富祖→本部約 45–55 分（09:30 退房出發可 10:30 前後到）。燒肉本部牧場或海邦丸海鮮丼。', searchQuery: '海邦丸 本部町' },
-    { day: 'D3', time: '13:00', title: '駛往 Mahaina／換裝準備', isHotel: false, color: '#8b5cf6', travelTime: '約 5–10分鐘', parking: '酒店停車場', desc: '海邦丸／本部町→Mahaina 只約 5–10 分。提早放行李、換裝，預留緩衝趕 14:05 專車。', searchQuery: 'Hotel Mahaina Wellness Resort Okinawa' },
-    { day: 'D3', time: '14:05', title: 'Hotel Mahaina 抵達／登記入住', isHotel: true, color: '#8b5cf6', travelTime: '婚禮專車', parking: '酒店停車場 (免費/住客專屬)', desc: '約 14:05 抵達 Mahaina（Trip.com 訂單 1578950516629519／PIN 7633；官方 15:00 後入住，可先放行李）。專車 14:10 開出 → Hortonoki 14:25（接駁：Wisteria 13:45 → Royal View 13:55 → Mahaina 14:05）。', searchQuery: 'Hotel Mahaina Wellness Resort Okinawa' },
-    { day: 'D3', time: '19:45', title: '婚禮晚宴／VANVAN → 返 Mahaina 💍', isHotel: false, color: '#8b5cf6', travelTime: '婚禮專車', parking: '不適用', desc: 'Hortonoki 19:45／20:00 出發 → MUSIC BAR VANVAN 20:10–22:45 → Hilton Sesoko 22:55 → 約 23:15 返 Hotel Mahaina（其後 Wisteria 23:20、Royal View 23:25）。', searchQuery: 'Hotel Mahaina Wellness Resort Okinawa' },
+    { day: 'D3', time: '09:30', title: '別墅退房出發', isHotel: true, color: '#8b5cf6', travelTime: '起點', parking: '住宿附設停車位', desc: '10:00 前退房。收拾行李，告別恩納村基地。', lat: 26.5125, lng: 127.9005, searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
+    { day: 'D3', time: '11:00', title: '本部町 午餐 (燒肉/海邦丸)', isHotel: false, color: '#8b5cf6', travelTime: '約 45–55分鐘', parking: '周邊停車場', desc: '安富祖→本部約 45–55 分（09:30 退房出發可 10:30 前後到）。燒肉本部牧場或海邦丸海鮮丼。', lat: 26.6585, lng: 127.891, searchQuery: '海邦丸 本部町' },
+    { day: 'D3', time: '13:00', title: '駛往 Mahaina／換裝準備', isHotel: false, color: '#8b5cf6', travelTime: '約 5–10分鐘', parking: '酒店停車場', desc: '海邦丸／本部町→Mahaina 只約 5–10 分。提早放行李、換裝，預留緩衝趕 14:05 專車。', lat: 26.683, lng: 127.8821, searchQuery: 'Hotel Mahaina Wellness Resort Okinawa' },
+    { day: 'D3', time: '14:05', title: 'Hotel Mahaina 抵達／登記入住', isHotel: true, color: '#8b5cf6', travelTime: '婚禮專車', parking: '酒店停車場 (免費/住客專屬)', desc: '約 14:05 抵達 Mahaina（Trip.com 訂單 1578950516629519／PIN 7633；官方 15:00 後入住，可先放行李）。專車 14:10 開出 → Hortonoki 14:25（接駁：Wisteria 13:45 → Royal View 13:55 → Mahaina 14:05）。', lat: 26.683, lng: 127.8821, searchQuery: 'Hotel Mahaina Wellness Resort Okinawa' },
+    { day: 'D3', time: '19:45', title: '婚禮晚宴／VANVAN → 返 Mahaina 💍', isHotel: false, color: '#8b5cf6', travelTime: '婚禮專車', parking: '不適用', desc: 'Hortonoki 19:45／20:00 出發 → MUSIC BAR VANVAN 20:10–22:45 → Hilton Sesoko 22:55 → 約 23:15 返 Hotel Mahaina（其後 Wisteria 23:20、Royal View 23:25）。', lat: 26.683, lng: 127.8821, searchQuery: 'Hotel Mahaina Wellness Resort Okinawa' },
 
-    { day: 'D4', time: '11:00', title: 'Hotel Mahaina 退房出發', isHotel: true, color: '#f97316', travelTime: '起點', parking: '酒店停車場', desc: '11:00 前退房，南下那霸方向。', searchQuery: 'Hotel Mahaina Wellness Resort Okinawa' },
-    { day: 'D4', time: '12:30', title: '美濱美國村', isHotel: false, color: '#f97316', travelTime: '約 1小時 30分', parking: '美國村大型免費停車場', desc: 'Mahaina→美國村官方約 90 分（11:00 退房可約 12:30 到）。12:30–14:30 打卡買潮物、lunch。', searchQuery: '美國村 沖繩' },
-    { day: 'D4', time: '15:00', title: 'AEON Mall Okinawa Rycom', isHotel: false, color: '#f97316', travelTime: '約 15–20分鐘', parking: '商場巨型免費停車場', desc: '美國村→Rycom 約 15–20 分。15:00–17:00 血拼；手信可喺度買齊。', searchQuery: 'AEON Mall Okinawa Rycom' },
-    { day: 'D4', time: '17:30', title: 'INFINISIS NAHA SHURIJO 入住', isHotel: true, color: '#f97316', travelTime: '約 40分鐘', parking: '附近收費停車場', desc: '那霸市松川 40。Trip.com 訂單 1578951053182664／PIN 5143；15:00 後入住。', searchQuery: 'INFINISIS NAHA SHURIJO 休伊特度假村' },
-    { day: 'D4', time: '18:30', title: '國際通購物', isHotel: false, color: '#f97316', travelTime: '約 10分鐘車', parking: '周邊收費停車場', desc: '松川→國際通約 10 分車。最後衝刺買手信。', searchQuery: '國際通 沖繩' },
-    { day: 'D4', time: '20:00', title: '國際通屋台村 晚餐 🏮', isHotel: false, color: '#f97316', travelTime: '步行', parking: '不適用', desc: '屋台串燒啤酒，收工。', searchQuery: '國際通屋台村' },
+    { day: 'D4', time: '11:00', title: 'Hotel Mahaina 退房出發', isHotel: true, color: '#f97316', travelTime: '起點', parking: '酒店停車場', desc: '11:00 前退房，南下那霸方向。', lat: 26.683, lng: 127.8821, searchQuery: 'Hotel Mahaina Wellness Resort Okinawa' },
+    { day: 'D4', time: '12:30', title: '美濱美國村', isHotel: false, color: '#f97316', travelTime: '約 1小時 30分', parking: '美國村大型免費停車場', desc: 'Mahaina→美國村官方約 90 分（11:00 退房可約 12:30 到）。12:30–14:30 打卡買潮物、lunch。', lat: 26.3165, lng: 127.757, searchQuery: '美國村 沖繩' },
+    { day: 'D4', time: '15:00', title: 'AEON Mall Okinawa Rycom', isHotel: false, color: '#f97316', travelTime: '約 15–20分鐘', parking: '商場巨型免費停車場', desc: '美國村→Rycom 約 15–20 分。15:00–17:00 血拼；手信可喺度買齊。', lat: 26.314, lng: 127.7955, searchQuery: 'AEON Mall Okinawa Rycom' },
+    { day: 'D4', time: '17:30', title: 'INFINISIS NAHA SHURIJO 入住', isHotel: true, color: '#f97316', travelTime: '約 40分鐘', parking: '附近收費停車場', desc: '那霸市松川 40。Trip.com 訂單 1578951053182664／PIN 5143；15:00 後入住。', lat: 26.219, lng: 127.709, searchQuery: 'INFINISIS NAHA SHURIJO 休伊特度假村' },
+    { day: 'D4', time: '18:30', title: '國際通購物', isHotel: false, color: '#f97316', travelTime: '約 10分鐘車', parking: '周邊收費停車場', desc: '松川→國際通約 10 分車。最後衝刺買手信。', lat: 26.217, lng: 127.689, searchQuery: '國際通 沖繩' },
+    { day: 'D4', time: '20:00', title: '國際通屋台村 晚餐 🏮', isHotel: false, color: '#f97316', travelTime: '步行', parking: '不適用', desc: '屋台串燒啤酒，收工。', lat: 26.2165, lng: 127.6875, searchQuery: '國際通屋台村' },
 
-    { day: 'D5', time: '08:30', title: 'INFINISIS 退房出發', isHotel: true, color: '#ec4899', travelTime: '起點', parking: '收費停車場', desc: '11:00 前退房；盡早出發趕還車。通堂／Outlet 因還車時間緊，改到 D4 買齊或略過。', searchQuery: 'INFINISIS NAHA SHURIJO 休伊特度假村' },
-    { day: 'D5', time: '09:00', title: '瀨長島 Umikaji Terrace', isHotel: false, color: '#ec4899', travelTime: '約 25–30分鐘', parking: '瀨長島免費停車場 (容易爆滿)', desc: '松川→瀨長約 25–30 分（08:30 出發）。09:00–10:20 早餐＋打卡睇飛機。唔好拖。', searchQuery: '瀨長島 Umikaji Terrace' },
-    { day: 'D5', time: '10:40', title: '機場附近入滿油', isHotel: false, color: '#ec4899', travelTime: '約 5–10分鐘', parking: '油站', desc: '瀨長島→機場周邊油站約 5–10 分。還車前必須加滿 Regular，保留收據。', searchQuery: '那霸機場 加油站' },
-    { day: 'D5', time: '11:30', title: 'Clover 還車 → 機場過關 ✈️', isHotel: false, color: '#ec4899', travelTime: '接駁約 15分鐘', parking: 'Clover 還車點', desc: '訂單還車 11:30（HB337 14:10）。之後接駁入機場過關。', searchQuery: '那霸機場 租車 Clover' }
+    { day: 'D5', time: '08:30', title: 'INFINISIS 退房出發', isHotel: true, color: '#ec4899', travelTime: '起點', parking: '收費停車場', desc: '11:00 前退房；盡早出發趕還車。通堂／Outlet 因還車時間緊，改到 D4 買齊或略過。', lat: 26.219, lng: 127.709, searchQuery: 'INFINISIS NAHA SHURIJO 休伊特度假村' },
+    { day: 'D5', time: '09:00', title: '瀨長島 Umikaji Terrace', isHotel: false, color: '#ec4899', travelTime: '約 25–30分鐘', parking: '瀨長島免費停車場 (容易爆滿)', desc: '松川→瀨長約 25–30 分（08:30 出發）。09:00–10:20 早餐＋打卡睇飛機。唔好拖。', lat: 26.1745, lng: 127.6455, searchQuery: '瀨長島 Umikaji Terrace' },
+    { day: 'D5', time: '10:40', title: '機場附近入滿油', isHotel: false, color: '#ec4899', travelTime: '約 5–10分鐘', parking: '油站', desc: '瀨長島→機場周邊油站約 5–10 分。還車前必須加滿 Regular，保留收據。', lat: 26.185, lng: 127.652, searchQuery: '那霸機場 加油站' },
+    { day: 'D5', time: '11:30', title: 'Clover 還車 → 機場過關 ✈️', isHotel: false, color: '#ec4899', travelTime: '接駁約 15分鐘', parking: 'Clover 還車點', desc: '訂單還車 11:30（HB337 14:10）。之後接駁入機場過關。', lat: 26.1838, lng: 127.6655, searchQuery: '那霸機場 租車 Clover' }
 ];
 
 const dayTitles = {
@@ -491,6 +553,95 @@ function getGoogleMapsLink(searchQuery) {
     return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(searchQuery);
 }
 
+function getDirectionsLink(lat, lng) {
+    return 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng;
+}
+
+function getGoogleSearchLink(pt) {
+    const q = (pt && pt.searchQuery) ? pt.searchQuery : (pt && pt.title ? pt.title : '');
+    return 'https://www.google.com/search?q=' + encodeURIComponent(q);
+}
+
+function getNavLink(pt) {
+    if (typeof pt.lat === 'number' && typeof pt.lng === 'number') return getDirectionsLink(pt.lat, pt.lng);
+    return getGoogleMapsLink(pt.searchQuery);
+}
+
+function placeActionButtonsHtml(pt, opts) {
+    const full = !!(opts && opts.fullWidth);
+    const search = getGoogleSearchLink(pt);
+    const nav = getNavLink(pt);
+    const wrap = full
+        ? 'grid grid-cols-2 gap-2'
+        : 'flex flex-wrap gap-2';
+    const btnBase = full
+        ? 'inline-flex items-center justify-center font-medium py-2 px-3 rounded-lg transition-colors text-sm cursor-pointer'
+        : 'self-start inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium transition-colors';
+    return '<div class="' + wrap + '">' +
+        '<a href="' + search + '" target="_blank" rel="noopener noreferrer" class="' + btnBase + ' bg-emerald-50 hover:bg-emerald-100 text-emerald-700">' +
+        '<i class="fa-solid fa-magnifying-glass mr-1"></i> Google 搜尋</a>' +
+        '<a href="' + nav + '" target="_blank" rel="noopener noreferrer" class="' + btnBase + ' bg-blue-50 hover:bg-blue-100 text-blue-600">' +
+        '<i class="fa-solid fa-diamond-turn-right mr-1"></i> 導航到這裏</a>' +
+        '</div>';
+}
+
+let dayMapInstance = null;
+
+function destroyDayMap() {
+    if (dayMapInstance) {
+        dayMapInstance.remove();
+        dayMapInstance = null;
+    }
+}
+
+function initDayMap(dayId, points) {
+    destroyDayMap();
+    const el = document.getElementById('day-map-' + dayId);
+    if (!el || typeof L === 'undefined') return;
+    const withCoords = points.filter(p => typeof p.lat === 'number' && typeof p.lng === 'number');
+    if (!withCoords.length) {
+        el.innerHTML = '<div class="flex items-center justify-center h-full text-sm text-gray-500">暫無座標</div>';
+        return;
+    }
+    dayMapInstance = L.map(el, { scrollWheelZoom: false });
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri',
+        maxZoom: 19
+    }).addTo(dayMapInstance);
+
+    const bounds = [];
+    withCoords.forEach((pt, i) => {
+        const n = i + 1;
+        const icon = L.divIcon({
+            className: '',
+            html: '<div class="map-marker-num">' + n + '</div>',
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
+            popupAnchor: [0, -14]
+        });
+        const nav = getDirectionsLink(pt.lat, pt.lng);
+        const search = getGoogleSearchLink(pt);
+        const popupHtml =
+            '<div><div class="font-bold text-gray-800">' +
+            (pt.time ? '<span style="color:#4f46e5">' + escapeHtml(pt.time) + '</span> ' : '') +
+            escapeHtml(pt.title) +
+            '</div><div class="map-popup-actions">' +
+            '<a class="map-search-btn" href="' + search + '" target="_blank" rel="noopener noreferrer">' +
+            '<i class="fa-solid fa-magnifying-glass"></i> Google 搜尋</a>' +
+            '<a class="map-nav-btn" href="' + nav + '" target="_blank" rel="noopener noreferrer">' +
+            '<i class="fa-solid fa-diamond-turn-right"></i> 導航到這裏</a></div></div>';
+        const marker = L.marker([pt.lat, pt.lng], { icon }).addTo(dayMapInstance);
+        marker.bindPopup(popupHtml);
+        bounds.push([pt.lat, pt.lng]);
+    });
+    if (bounds.length === 1) {
+        dayMapInstance.setView(bounds[0], 14);
+    } else {
+        dayMapInstance.fitBounds(bounds, { padding: [36, 36] });
+    }
+    setTimeout(() => { if (dayMapInstance) dayMapInstance.invalidateSize(); }, 80);
+}
+
 function switchTab(tab) {
     currentTab = tab;
     document.querySelectorAll('.nav-tab').forEach(el => {
@@ -548,6 +699,7 @@ function closeAuditModal() { document.getElementById('audit-modal').style.displa
 
 function renderContent(tab) {
     const sidebar = document.getElementById('sidebar-content');
+    destroyDayMap();
     sidebar.innerHTML = '';
 
     if (tab === 'ACCOUNTING') { renderAccounting(); return; }
@@ -652,14 +804,11 @@ function renderContent(tab) {
                     </h3>
                     <ul class="space-y-3 text-sm">`;
             dayPoints.forEach(pt => {
-                const mapsLink = getGoogleMapsLink(pt.searchQuery);
                 allHtml += `
                     <li class="flex flex-col border-b border-gray-50 pb-3 gap-1">
                         <div class="font-semibold text-gray-800 text-base">${pt.time ? `<span class="text-indigo-600 font-bold mr-2">${escapeHtml(pt.time)}</span>` : ''}${pt.isHotel ? '🏠 ' : ''}${escapeHtml(pt.title)}</div>
                         <div class="text-xs text-gray-500 mb-1">${escapeHtml(pt.desc)}</div>
-                        <a href="${mapsLink}" target="_blank" rel="noopener noreferrer" class="self-start inline-flex bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-medium items-center transition-colors">
-                            <i class="fa-solid fa-location-arrow mr-1"></i> Google 地圖搜尋
-                        </a>
+                        ${placeActionButtonsHtml(pt)}
                     </li>`;
             });
             allHtml += '</ul></div>';
@@ -672,30 +821,40 @@ function renderContent(tab) {
     const points = itineraryData.filter(d => d.day === tab);
     let seqCount = 1;
     let dayHtml = '<div class="w-full pb-12 space-y-4">';
-    points.forEach(pt => {
+    dayHtml += `
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-4 py-2 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="font-bold text-sm text-blue-900"><i class="fa-solid fa-map-location-dot mr-1.5"></i>當日地圖</h3>
+                <span class="text-[10px] text-gray-400">撳標記睇詳情／導航</span>
+            </div>
+            <div id="day-map-${tab}" class="day-map"></div>
+        </div>`;
+    points.forEach((pt, idx) => {
+        const mapNum = idx + 1;
         let iconHtml = pt.isHotel ? '🏠' : String(seqCount);
         if (!pt.isHotel) seqCount++;
-        const mapsLink = getGoogleMapsLink(pt.searchQuery);
         dayHtml += `
             <div class="timeline-item">
                 <div class="timeline-icon ${pt.isHotel ? 'timeline-hotel-icon' : ''}" style="${!pt.isHotel ? 'background-color:' + pt.color : ''}">
                     ${iconHtml}
                 </div>
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                    <h3 class="font-bold text-lg text-gray-800 mb-1">${pt.time ? `<span class="inline-block bg-indigo-100 text-indigo-700 text-sm font-bold px-2 py-0.5 rounded mr-2">${escapeHtml(pt.time)}</span>` : ''}${escapeHtml(pt.title)}</h3>
+                    <div class="flex items-start gap-2 mb-1">
+                        <span class="shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-900 text-white text-xs font-bold">${mapNum}</span>
+                        <h3 class="font-bold text-lg text-gray-800">${pt.time ? `<span class="inline-block bg-indigo-100 text-indigo-700 text-sm font-bold px-2 py-0.5 rounded mr-2">${escapeHtml(pt.time)}</span>` : ''}${escapeHtml(pt.title)}</h3>
+                    </div>
                     <p class="text-sm text-gray-600 mb-3">${escapeHtml(pt.desc)}</p>
                     <div class="grid grid-cols-2 gap-2 text-xs text-gray-500 mb-3 bg-gray-50 p-2 rounded-lg">
                         <div><i class="fa-solid fa-clock mr-1"></i> 行車: ${escapeHtml(pt.travelTime)}</div>
                         <div><i class="fa-solid fa-square-parking mr-1"></i> 泊車: ${escapeHtml(pt.parking)}</div>
                     </div>
-                    <a href="${mapsLink}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-full bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium py-2 px-4 rounded-lg transition-colors text-sm cursor-pointer">
-                        <i class="fa-solid fa-location-arrow mr-2"></i> Google 地圖搜尋
-                    </a>
+                    ${placeActionButtonsHtml(pt, { fullWidth: true })}
                 </div>
             </div>`;
     });
     dayHtml += '</div>';
     sidebar.innerHTML = dayHtml;
+    initDayMap(tab, points);
 }
 
 function toHKD(ex) {
@@ -1121,10 +1280,64 @@ document.getElementById('nav-tabs').addEventListener('click', (e) => {
     if (tab) switchTab(tab);
 });
 
-(async function init() {
+const APP_GATE_KEY = 'okTripUnlocked';
+const APP_GATE_PASSWORD = '666666';
+
+function isAppUnlocked() {
+    try { return localStorage.getItem(APP_GATE_KEY) === '1'; } catch (e) { return false; }
+}
+
+function hideAppGate() {
+    const gate = document.getElementById('app-gate');
+    if (gate) gate.style.display = 'none';
+}
+
+function showAppGate() {
+    const gate = document.getElementById('app-gate');
+    if (!gate) return;
+    gate.style.display = 'flex';
+    const err = document.getElementById('gate-error');
+    const input = document.getElementById('gate-input');
+    if (err) err.classList.add('hidden');
+    if (input) {
+        input.value = '';
+        setTimeout(() => input.focus(), 80);
+    }
+}
+
+function submitAppGate() {
+    const input = document.getElementById('gate-input');
+    const err = document.getElementById('gate-error');
+    const pwd = (input && input.value ? input.value : '').trim();
+    if (pwd === APP_GATE_PASSWORD) {
+        try { localStorage.setItem(APP_GATE_KEY, '1'); } catch (e) {}
+        hideAppGate();
+        bootApp();
+    } else {
+        if (err) err.classList.remove('hidden');
+        if (input) {
+            input.value = '';
+            input.focus();
+        }
+    }
+}
+
+let appBooted = false;
+async function bootApp() {
+    if (appBooted) return;
+    appBooted = true;
     setSyncStatus(CLOUDFLARE_API_URL ? 'syncing' : 'local');
     await loadAccData();
     switchTab('ALL');
+}
+
+(async function init() {
+    if (isAppUnlocked()) {
+        hideAppGate();
+        await bootApp();
+    } else {
+        showAppGate();
+    }
 })();
 </script>
 </body>
