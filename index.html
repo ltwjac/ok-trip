@@ -4,13 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>
-        /* Unlock before first paint. If this fails, the page stays locked. */
+        /* Drop any saved unlock before first paint so a reload always shows the gate. */
         (function () {
-            try {
-                if (localStorage.getItem('okTripUnlocked') === '1') {
-                    document.documentElement.classList.add('app-unlocked');
-                }
-            } catch (e) {}
+            try { localStorage.removeItem('okTripUnlocked'); } catch (e) {}
         })();
     </script>
     <meta name="theme-color" content="#1e3a8a">
@@ -837,6 +833,7 @@ function destroyDayMap() {
 function createTripMap(el) {
     const map = L.map(el, {
         scrollWheelZoom: false,
+        dragging: true,
         doubleClickZoom: true,
         touchZoom: true
     });
@@ -948,18 +945,20 @@ function initAllDaysMap() {
     allMapMarkers = placeMarkers(dayMapInstance, stops);
 }
 
-/** Pinch zooms the map in and out. A single finger is left for page scroll. */
+/**
+ * One finger pans (Leaflet dragging). Double-click and double-tap zoom in
+ * (doubleClickZoom, including Leaflet's touch dblclick fallback). Pinch stays
+ * on touchZoom. Wheel scrolling is left to the page.
+ */
 function bindMapPinchGuard(map) {
     const el = map.getContainer();
+    if (map.dragging && !map.dragging.enabled()) map.dragging.enable();
     if (map.doubleClickZoom && !map.doubleClickZoom.enabled()) map.doubleClickZoom.enable();
     if (map.touchZoom && !map.touchZoom.enabled()) map.touchZoom.enable();
     // Leaflet stops wheel events on the map even when scroll zoom is off.
     if (window.L && L.DomEvent && L.DomEvent.off && L.DomEvent.stopPropagation) {
         L.DomEvent.off(el, 'wheel', L.DomEvent.stopPropagation);
     }
-    const fingerScroll = (window.matchMedia && window.matchMedia('(pointer: coarse)').matches)
-        || !!(window.L && L.Browser && L.Browser.mobile);
-    if (fingerScroll && map.dragging && map.dragging.enabled()) map.dragging.disable();
     const stopPinchSteal = function (e) {
         if (e.touches && e.touches.length > 1) e.preventDefault();
     };
@@ -1678,7 +1677,7 @@ function addExpense() {
 
 function requestDelete(id) {
     showConfirm('確定要刪除這筆紀錄嗎？', () => {
-        showConfirm('不要以為悄悄刪除就沒有人知道😏', () => executeDelete(id), '仍然刪除', '取消');
+        showConfirm('唔好以為靜靜雞del撚咗就冇人知😏', () => executeDelete(id), '仍然刪除', '取消');
     });
 }
 
@@ -1706,8 +1705,7 @@ const APP_GATE_KEY = 'okTripUnlocked';
 const APP_GATE_PASSWORD = '666666';
 
 function isAppUnlocked() {
-    if (document.documentElement.classList.contains('app-unlocked')) return true;
-    try { return localStorage.getItem(APP_GATE_KEY) === '1'; } catch (e) { return false; }
+    return document.documentElement.classList.contains('app-unlocked');
 }
 
 function setGateError(show) {
@@ -1744,7 +1742,7 @@ function submitAppGate() {
     const input = document.getElementById('gate-input');
     const pwd = (input && input.value ? input.value : '').trim();
     if (pwd === APP_GATE_PASSWORD) {
-        try { localStorage.setItem(APP_GATE_KEY, '1'); } catch (e) {}
+        try { localStorage.removeItem(APP_GATE_KEY); } catch (e) {}
         hideAppGate();
         bootApp();
     } else {
@@ -1766,12 +1764,12 @@ async function bootApp() {
 }
 
 (async function init() {
-    if (isAppUnlocked()) {
-        hideAppGate();
-        await bootApp();
-    } else {
-        showAppGate();
-    }
+    try { localStorage.removeItem(APP_GATE_KEY); } catch (e) {}
+    showAppGate();
+    window.addEventListener('pageshow', function (event) {
+        try { localStorage.removeItem(APP_GATE_KEY); } catch (e) {}
+        if (event.persisted) showAppGate();
+    });
 })();
 </script>
 </body>
