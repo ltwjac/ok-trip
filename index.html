@@ -461,16 +461,16 @@ const AUDIT_PASS_HASH = '3afddfdd432759f906ff30983fbecfd56b022e56433b598d2b04e31
 const itineraryData = [
     { day: 'D1', time: '13:10', title: 'HB336 抵達那霸機場', isHotel: false, color: '#3b82f6', travelTime: '抵達', parking: '機場', desc: '香港 09:45 起飛 → 沖繩 13:10 抵達。過關提取行李後前往 Clover 接駁點。', lat: 26.2065, lng: 127.6465, searchQuery: '那霸機場' },
     { day: 'D1', time: '14:30', title: 'Clover 取車（Voxy 或類似）', isHotel: false, color: '#3b82f6', travelTime: '接駁約 15分鐘', parking: 'Clover 停車場', desc: '訂單取車 14:30（HB336 抵達後過關＋接駁）。檢查車況、保險、加油規矩；導航用電話即可。', lat: 26.1838, lng: 127.6655, searchQuery: '那霸機場 租車 Clover' },
-    { day: 'D1', time: '16:00', title: '浜の家海鮮食堂 午餐', isHotel: false, color: '#3b82f6', travelTime: '約 70–80分鐘', parking: '餐廳專屬停車場 (免費)', desc: '取車後先北上仲泊用餐，車程約 70–80 分。當地新鮮海產，奶油烤魚必試。', lat: 26.4358, lng: 127.7922, searchQuery: '浜の家海鮮食堂 恩納村' },
-    { day: 'D1', time: '17:00', title: '殘波岬燈塔 & 壯麗斷崖', isHotel: false, color: '#3b82f6', travelTime: '約 20分鐘', parking: '免費停車場', desc: '午餐後前往殘波岬，仲泊→殘波約 20 分。短停燈塔與斷崖拍照（約 35–40 分鐘）。', lat: 26.4411, lng: 127.7125, searchQuery: '殘波岬燈塔 沖繩' },
-    { day: 'D1', time: '18:15', title: 'グランディオーソ沖縄プールヴィラ恩納 7D 入住', isHotel: true, color: '#ef4444', travelTime: '約 30–40分鐘', parking: '住宿附設停車位', desc: '〒904-0402 恩納村安富祖1854-7。Trip.com 訂單 1578951053121146／PIN 1480；16:00–23:00 入住。殘波岬後北上安富祖約 30–40 分。', lat: 26.5125, lng: 127.9005, searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
-    { day: 'D1', time: '18:40', title: '恩納村海灘／別墅休整', isHotel: false, color: '#3b82f6', travelTime: '約 5分鐘', parking: '海灘公共停車場', desc: '11 月日落較早；入住後稍作休整，再出發用晚餐。', lat: 26.511, lng: 127.8975, searchQuery: '恩納村 海灘' },
-    { day: 'D1', time: '19:00', title: '琉球之牛 (恩納店) 晚餐', isHotel: false, color: '#3b82f6', travelTime: '約 10分鐘', parking: '餐廳專屬/附近收費停車場', desc: '約 19:00 享用頂級沖繩和牛燒肉，第一日行程結束。建議預先訂位。', lat: 26.4469, lng: 127.8042, searchQuery: '琉球之牛 恩納店' },
+    { day: 'D1', time: '15:00', title: '沖縄アウトレットモールあしびなー', isHotel: false, color: '#3b82f6', travelTime: '約 10分鐘', parking: '商場免費停車場', desc: '取車後前往豊見城市豊崎，停留時間彈性。若感到飢餓，可在美食廣場吃少量小食，留待晚上燒肉。若在此逗留較久，可略過殘波岬，直接北上別墅。', lat: 26.1591, lng: 127.6576, searchQuery: '沖縄アウトレットモールあしびなー' },
+    { day: 'D1', time: '可選', title: '殘波岬燈塔（可略過）', isHotel: false, color: '#3b82f6', travelTime: '約 50–60分鐘', parking: '免費停車場', desc: '可選站，並非必到。只有 Outlet 未逗留太久、仍可趕上入住與 19:45 晚餐時才繞道。由豊崎出發約 50–60 分，燈塔與斷崖短停約 30 分鐘；時間不足請直接前往別墅。', lat: 26.4411, lng: 127.7125, searchQuery: '殘波岬燈塔 沖繩' },
+    { day: 'D1', time: '約 18:00', title: 'グランディオーソ沖縄プールヴィラ恩納 7D 入住', isHotel: true, color: '#ef4444', travelTime: '約 30–75分鐘', parking: '住宿附設停車位', desc: '〒904-0402 恩納村安富祖1854-7。Trip.com 訂單 1578951053121146／PIN 1480；入住時段仍為 16:00–23:00。Outlet 後直達約 60–75 分；若先經殘波岬，其後北上約 30–40 分。實際抵達視乎購物時間。', lat: 26.5125, lng: 127.9005, searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
+    { day: 'D1', time: '可選', title: '恩納村海灘／別墅休整', isHotel: false, color: '#3b82f6', travelTime: '約 5分鐘', parking: '海灘公共停車場', desc: '入住後若距離 19:45 晚餐仍有空檔，可到附近海灘稍作休息；抵達較晚則留在別墅，再出發用餐。', lat: 26.511, lng: 127.8975, searchQuery: '恩納村 海灘' },
+    { day: 'D1', time: '19:45', title: '琉球之牛 (恩納店) 晚餐', isHotel: false, color: '#3b82f6', travelTime: '約 10分鐘', parking: '餐廳專屬/附近收費停車場', desc: '已訂位 19:45，享用沖繩和牛燒肉。第一日行程結束。', lat: 26.4469, lng: 127.8042, searchQuery: '琉球之牛 恩納店' },
 
-    { day: 'D2', time: '09:00', title: '別墅出發', isHotel: true, color: '#10b981', travelTime: '起點', parking: '住宿附設停車位', desc: '早上集合出發。', lat: 26.5125, lng: 127.9005, searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
-    { day: 'D2', time: '09:30', title: '青之洞窟 (真榮田岬) 浮潛', isHotel: false, color: '#10b981', travelTime: '約 20–25分鐘', parking: '真榮田岬收費停車場', desc: '安富祖→真榮田約 20–25 分。09:30–11:30 藍洞浮潛。旺季建議及早預約店家。', lat: 26.4447, lng: 127.7724, searchQuery: '真榮田岬 青之洞窟' },
-    { day: 'D2', time: '12:00', title: '恩納村阿古豬涮涮鍋 午餐', isHotel: false, color: '#10b981', travelTime: '約 15分鐘', parking: '餐廳提供', desc: '真榮田返回恩納午餐約 15 分；約 13:00 前出發前往 SUP。', lat: 26.455, lng: 127.81, searchQuery: '恩納村 阿古豬' },
-    { day: 'D2', time: '14:00', title: '恩納村 SUP', isHotel: false, color: '#10b981', travelTime: '約 10–20分鐘', parking: '店家／海灘停車場', desc: '午餐後恩納海岸 SUP（約 60–90 分）。11 月視天氣與店家場次；建議及早預約。不必北上。', lat: 26.49, lng: 127.855, searchQuery: '恩納村 SUP' },
+    { day: 'D2', time: '07:20', title: '別墅出發', isHotel: true, color: '#10b981', travelTime: '起點', parking: '住宿附設停車位', desc: '約 07:20 出發。安富祖→真榮田約 20–25 分，以便 08:00 開始 Fun diving。', lat: 26.5125, lng: 127.9005, searchQuery: 'グランディオーソ沖縄プールヴィラ恩納 7D' },
+    { day: 'D2', time: '08:00', title: 'Fun diving（真榮田／青洞一帶）', isHotel: false, color: '#10b981', travelTime: '約 20–25分鐘', parking: '真榮田岬收費停車場', desc: '08:00 開始 Fun diving，地點在真榮田／青之洞窟一帶；店名以預約為準。預計午前結束，午餐後再去 SUP。', lat: 26.4447, lng: 127.7724, searchQuery: '真榮田岬 ファンダイビング' },
+    { day: 'D2', time: '約 12:30', title: '現場決定／其他午餐', isHotel: false, color: '#10b981', travelTime: '約 15–20分鐘', parking: '現場停車場', desc: '潛水結束後於恩納一帶現場決定午餐。標記為恩納村中心附近，供導航參考，並非指定餐廳。約 13:40 前出發前往 SUP。', lat: 26.4974, lng: 127.8536, searchQuery: '恩納村 午餐' },
+    { day: 'D2', time: '14:00', title: '恩納村 SUP', isHotel: false, color: '#10b981', travelTime: '約 10–20分鐘', parking: '店家／海灘停車場', desc: '午餐後於恩納海岸 SUP（約 60–90 分）。11 月視天氣與店家場次；建議及早預約。不必北上。', lat: 26.49, lng: 127.855, searchQuery: '恩納村 SUP' },
     { day: 'D2', time: '17:00', title: '返回別墅休整', isHotel: false, color: '#10b981', travelTime: '約 10–15分鐘', parking: '別墅停車', desc: 'SUP 後返回別墅（距離近）。洗澡，並購買 BBQ 食材／啤酒。', lat: 26.5125, lng: 127.9005, searchQuery: '恩納村 超市' },
     { day: 'D2', time: '19:00', title: '別墅 BBQ 晚餐', isHotel: false, color: '#10b981', travelTime: '原地', parking: '別墅停車', desc: '兄弟 BBQ，痛快暢飲。', lat: 26.5125, lng: 127.9005, searchQuery: '恩納村 BBQ' },
 
@@ -484,10 +484,10 @@ const itineraryData = [
     { day: 'D4', time: '12:30', title: '美濱美國村', isHotel: false, color: '#f97316', travelTime: '約 1小時 30分', parking: '美國村大型免費停車場', desc: 'Mahaina→美國村官方約 90 分（11:00 退房，約 12:30 抵達）。12:30–14:30 拍照、選購潮流商品及午餐。', lat: 26.3165, lng: 127.757, searchQuery: '美國村 沖繩' },
     { day: 'D4', time: '15:00', title: 'AEON Mall Okinawa Rycom', isHotel: false, color: '#f97316', travelTime: '約 15–20分鐘', parking: '商場巨型免費停車場', desc: '美國村→Rycom 約 15–20 分。15:00–17:00 購物；手信可在此買齊。', lat: 26.314, lng: 127.7955, searchQuery: 'AEON Mall Okinawa Rycom' },
     { day: 'D4', time: '17:30', title: 'INFINISIS NAHA SHURIJO 入住', isHotel: true, color: '#f97316', travelTime: '約 40分鐘', parking: '附近收費停車場', desc: '那霸市松川 40。Trip.com 訂單 1578951053182664／PIN 5143；15:00 後入住。', lat: 26.219, lng: 127.709, searchQuery: 'INFINISIS NAHA SHURIJO 休伊特度假村' },
-    { day: 'D4', time: '18:30', title: '國際通購物', isHotel: false, color: '#f97316', travelTime: '約 10 分鐘車程', parking: '周邊收費停車場', desc: '松川→國際通約 10 分鐘車程。最後採購手信。', lat: 26.217, lng: 127.689, searchQuery: '國際通 沖繩' },
-    { day: 'D4', time: '20:00', title: '國際通屋台村 晚餐 🏮', isHotel: false, color: '#f97316', travelTime: '步行', parking: '不適用', desc: '屋台串燒與啤酒，當日行程結束。', lat: 26.2165, lng: 127.6875, searchQuery: '國際通屋台村' },
+    { day: 'D4', time: '18:00', title: '國際通購物', isHotel: false, color: '#f97316', travelTime: '約 10 分鐘車程', parking: '周邊收費停車場', desc: '松川→國際通約 10 分鐘車程。17:30 入住後先購物，並於約 19:15 前前往已訂涮涮鍋（19:30）。', lat: 26.217, lng: 127.689, searchQuery: '國際通 沖繩' },
+    { day: 'D4', time: '19:30', title: '已訂涮涮鍋 19:30', isHotel: false, color: '#f97316', travelTime: '步行', parking: '沿用國際通停車場', desc: '已訂涮涮鍋 19:30。店名以訂位資料為準；標記在國際通一帶，搜尋可用「國際通 涮涮鍋」。購物後步行前往，當日行程結束。', lat: 26.217, lng: 127.689, searchQuery: '國際通 涮涮鍋' },
 
-    { day: 'D5', time: '08:30', title: 'INFINISIS 退房出發', isHotel: true, color: '#ec4899', travelTime: '起點', parking: '收費停車場', desc: '11:00 前退房；盡早出發以趕上還車。通堂／Outlet 因還車時間緊迫，改於 D4 買齊或略過。', lat: 26.219, lng: 127.709, searchQuery: 'INFINISIS NAHA SHURIJO 休伊特度假村' },
+    { day: 'D5', time: '08:30', title: 'INFINISIS 退房出發', isHotel: true, color: '#ec4899', travelTime: '起點', parking: '收費停車場', desc: '11:00 前退房；盡早出發以趕上還車。あしびなー已安排在 D1；通堂因還車時間緊迫而略過。', lat: 26.219, lng: 127.709, searchQuery: 'INFINISIS NAHA SHURIJO 休伊特度假村' },
     { day: 'D5', time: '09:00', title: '瀨長島 Umikaji Terrace', isHotel: false, color: '#ec4899', travelTime: '約 25–30分鐘', parking: '瀨長島免費停車場 (容易爆滿)', desc: '松川→瀨長約 25–30 分（08:30 出發）。09:00–10:20 用早餐，並拍照觀看飛機。請勿拖延。', lat: 26.1745, lng: 127.6455, searchQuery: '瀨長島 Umikaji Terrace' },
     { day: 'D5', time: '10:40', title: '機場附近加滿油', isHotel: false, color: '#ec4899', travelTime: '約 5–10分鐘', parking: '油站', desc: '瀨長島→機場周邊油站約 5–10 分。還車前必須加滿 Regular，保留收據。', lat: 26.185, lng: 127.652, searchQuery: '那霸機場 加油站' },
     { day: 'D5', time: '11:30', title: 'Clover 還車 → 機場過關 ✈️', isHotel: false, color: '#ec4899', travelTime: '接駁約 15分鐘', parking: 'Clover 還車點', desc: '訂單還車 11:30（HB337 14:10）。之後接駁前往機場過關。', lat: 26.1838, lng: 127.6655, searchQuery: '那霸機場 租車 Clover' }
@@ -495,7 +495,7 @@ const itineraryData = [
 
 const dayTitles = {
     D1: 'Day 1 (那霸 / 恩納村)',
-    D2: 'Day 2 (青之洞窟 / SUP)',
+    D2: 'Day 2 (Fun diving / SUP)',
     D3: 'Day 3 (本部町 / 婚禮)',
     D4: 'Day 4 (美國村 / 國際通)',
     D5: 'Day 5 (瀨長島 / 還車返回香港)'
@@ -1074,8 +1074,8 @@ function handbookSearchHtml() {
             title: '中部',
             items: [
                 ['萬座毛', '查步道、展望位置與停車場。', '萬座毛 沖繩'],
-                ['真榮田岬（青之洞窟）', '查浮潛店家、場次與海況。', '真榮田岬 青之洞窟'],
-                ['殘波岬燈塔', '查開放時間與斷崖步道。', '殘波岬燈塔'],
+                ['真榮田岬（青之洞窟一帶）', 'D2 08:00 Fun diving。查店家、集合時間與海況。', '真榮田岬 ファンダイビング'],
+                ['殘波岬燈塔', 'D1 可選：Outlet 逗留較久即可略過。查開放時間與斷崖步道。', '殘波岬燈塔'],
                 ['美國村', '查停車場、商店與日落位置。', '美國村 沖繩'],
                 ['AEON Mall 沖繩 Rycom', '查營業時間與手信店。', 'AEON Mall Okinawa Rycom']
             ]
@@ -1084,7 +1084,8 @@ function handbookSearchHtml() {
             title: '南部',
             items: [
                 ['首里城', '查參觀時間與城跡開放範圍。', '首里城'],
-                ['國際通', '查商店街範圍、屋台村與交通。', '國際通 那霸'],
+                ['國際通', '查商店街範圍與交通。D4 晚餐為已訂涮涮鍋 19:30。', '國際通 那霸'],
+                ['沖縄アウトレットモールあしびなー', 'D1 取車後前往，停留時間彈性；可在美食廣場吃小食。', '沖縄アウトレットモールあしびなー'],
                 ['瀨長島 Umikaji Terrace', '查停車場與飛機觀賞位置。', '瀨長島 Umikaji Terrace'],
                 ['波上宮', '查參拜時間與海邊位置。', '波上宮 那霸'],
                 ['那霸機場', '查航班動態與租車接駁。', '那霸機場']
