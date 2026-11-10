@@ -471,6 +471,7 @@ const itineraryData = [
     { day: 'D2', time: '08:00', title: 'Fun diving（真榮田／青洞一帶）', isHotel: false, color: '#10b981', travelTime: '約 20–25分鐘', parking: '真榮田岬收費停車場', desc: '08:00 開始 Fun diving，地點在真榮田／青之洞窟一帶；店名以預約為準。預計午前結束，午餐後再去 SUP。', lat: 26.4447, lng: 127.7724, searchQuery: '真榮田岬 ファンダイビング' },
     { day: 'D2', time: '約 12:30', title: '現場決定／其他午餐', isHotel: false, color: '#10b981', travelTime: '約 15–20分鐘', parking: '現場停車場', desc: '潛水結束後於恩納一帶現場決定午餐。標記為恩納村中心附近，供導航參考，並非指定餐廳。約 13:40 前出發前往 SUP。', lat: 26.4974, lng: 127.8536, searchQuery: '恩納村 午餐' },
     { day: 'D2', time: '14:00', title: '恩納村 SUP', isHotel: false, color: '#10b981', travelTime: '約 10–20分鐘', parking: '店家／海灘停車場', desc: '午餐後於恩納海岸 SUP（約 60–90 分）。11 月視天氣與店家場次；建議及早預約。不必北上。', lat: 26.49, lng: 127.855, searchQuery: '恩納村 SUP' },
+    { day: 'D2', time: '17:00', title: 'SUP', isHotel: false, color: '#10b981', desc: '17:00 SUP。' },
     { day: 'D2', time: '17:00', title: '返回別墅休整', isHotel: false, color: '#10b981', travelTime: '約 10–15分鐘', parking: '別墅停車', desc: 'SUP 後返回別墅（距離近）。洗澡，並購買 BBQ 食材／啤酒。', lat: 26.5125, lng: 127.9005, searchQuery: '恩納村 超市' },
     { day: 'D2', time: '19:00', title: '別墅 BBQ 晚餐', isHotel: false, color: '#10b981', travelTime: '原地', parking: '別墅停車', desc: '兄弟 BBQ，痛快暢飲。', lat: 26.5125, lng: 127.9005, searchQuery: '恩納村 BBQ' },
 
@@ -485,7 +486,7 @@ const itineraryData = [
     { day: 'D4', time: '15:00', title: 'AEON Mall Okinawa Rycom', isHotel: false, color: '#f97316', travelTime: '約 15–20分鐘', parking: '商場巨型免費停車場', desc: '美國村→Rycom 約 15–20 分。15:00–17:00 購物；手信可在此買齊。', lat: 26.314, lng: 127.7955, searchQuery: 'AEON Mall Okinawa Rycom' },
     { day: 'D4', time: '17:30', title: 'INFINISIS NAHA SHURIJO 入住', isHotel: true, color: '#f97316', travelTime: '約 40分鐘', parking: '附近收費停車場', desc: '那霸市松川 40。Trip.com 訂單 1578951053182664／PIN 5143；15:00 後入住。', lat: 26.219, lng: 127.709, searchQuery: 'INFINISIS NAHA SHURIJO 休伊特度假村' },
     { day: 'D4', time: '18:00', title: '國際通購物', isHotel: false, color: '#f97316', travelTime: '約 10 分鐘車程', parking: '周邊收費停車場', desc: '松川→國際通約 10 分鐘車程。17:30 入住後先購物，並於約 19:15 前前往已訂涮涮鍋（19:30）。', lat: 26.217, lng: 127.689, searchQuery: '國際通 沖繩' },
-    { day: 'D4', time: '19:30', title: '已訂涮涮鍋 19:30', isHotel: false, color: '#f97316', travelTime: '步行', parking: '沿用國際通停車場', desc: '已訂涮涮鍋 19:30。店名以訂位資料為準；標記在國際通一帶，搜尋可用「國際通 涮涮鍋」。購物後步行前往，當日行程結束。', lat: 26.217, lng: 127.689, searchQuery: '國際通 涮涮鍋' },
+    { day: 'D4', time: '19:30', title: '金武アグーと山城牛のしゃぶしゃぶ琉球 國際通店', isHotel: false, color: '#f97316', travelTime: '步行', parking: '沿用國際通停車場', desc: '已訂位 19:30 涮涮鍋，4 人。預約編號 FT4G2CTPY3。桌席、禁煙。預計約 1.5 小時。當日結帳。', lat: 26.217, lng: 127.689, searchQuery: '金武アグーと山城牛のしゃぶしゃぶ琉球 國際通店' },
 
     { day: 'D5', time: '08:30', title: 'INFINISIS 退房出發', isHotel: true, color: '#ec4899', travelTime: '起點', parking: '收費停車場', desc: '11:00 前退房；盡早出發以趕上還車。あしびなー已安排在 D1；通堂因還車時間緊迫而略過。', lat: 26.219, lng: 127.709, searchQuery: 'INFINISIS NAHA SHURIJO 休伊特度假村' },
     { day: 'D5', time: '09:00', title: '瀨長島 Umikaji Terrace', isHotel: false, color: '#ec4899', travelTime: '約 25–30分鐘', parking: '瀨長島免費停車場 (容易爆滿)', desc: '松川→瀨長約 25–30 分（08:30 出發）。09:00–10:20 用早餐，並拍照觀看飛機。請勿拖延。', lat: 26.1745, lng: 127.6455, searchQuery: '瀨長島 Umikaji Terrace' },
@@ -774,13 +775,18 @@ function getNavLink(pt) {
     return getGoogleMapsLink(pt.searchQuery);
 }
 
+function hasMapCoords(pt) {
+    return !!(pt && typeof pt.lat === 'number' && typeof pt.lng === 'number');
+}
+
 function placeActionButtonsHtml(pt, opts) {
+    if (!hasMapCoords(pt) && !(pt && pt.searchQuery)) return '';
     const full = !!(opts && opts.fullWidth);
     const day = opts && opts.day;
     const idx = opts && typeof opts.idx === 'number' ? opts.idx : null;
-    const showMap = day != null && idx != null;
     const search = getGoogleSearchLink(pt);
     const nav = getNavLink(pt);
+    const showMap = hasMapCoords(pt) && day != null && idx != null;
     const wrap = full
         ? 'grid grid-cols-2 gap-2'
         : 'flex flex-wrap gap-2';
@@ -1229,7 +1235,7 @@ function renderContent(tab) {
                 allHtml += `
                     <li class="flex flex-col border-b border-gray-50 pb-3 gap-1">
                         <div class="font-semibold text-gray-800 text-base"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-900 text-white text-[10px] font-bold mr-1.5 align-middle">${idx + 1}</span>${pt.time ? `<span class="text-indigo-600 font-bold mr-2">${escapeHtml(pt.time)}</span>` : ''}${pt.isHotel ? '🏠 ' : ''}${escapeHtml(pt.title)}</div>
-                        <div class="text-xs text-gray-500 mb-1">${escapeHtml(pt.desc)}</div>
+                        ${pt.desc ? `<div class="text-xs text-gray-500 mb-1">${escapeHtml(pt.desc)}</div>` : ''}
                         ${placeActionButtonsHtml(pt, { day: d, idx, onAllMap: true })}
                     </li>`;
             });
@@ -1265,11 +1271,11 @@ function renderContent(tab) {
                         <span class="stop-badge">${mapNum}</span>
                         <h3 class="font-bold text-lg text-gray-800 min-w-0">${pt.time ? `<span class="inline-block bg-indigo-100 text-indigo-700 text-sm font-bold px-2 py-0.5 rounded mr-2">${escapeHtml(pt.time)}</span>` : ''}${escapeHtml(pt.title)}</h3>
                     </div>
-                    <p class="text-sm text-gray-600 mb-3">${escapeHtml(pt.desc)}</p>
-                    <div class="grid grid-cols-2 gap-2 text-xs text-gray-500 mb-3 bg-gray-50 p-2 rounded-lg">
+                    ${pt.desc ? `<p class="text-sm text-gray-600 mb-3">${escapeHtml(pt.desc)}</p>` : ''}
+                    ${(pt.travelTime || pt.parking) ? `<div class="grid grid-cols-2 gap-2 text-xs text-gray-500 mb-3 bg-gray-50 p-2 rounded-lg">
                         <div><i class="fa-solid fa-clock mr-1"></i> 行車: ${escapeHtml(pt.travelTime)}</div>
                         <div><i class="fa-solid fa-square-parking mr-1"></i> 泊車: ${escapeHtml(pt.parking)}</div>
-                    </div>
+                    </div>` : ''}
                     ${placeActionButtonsHtml(pt, { fullWidth: true, day: tab, idx })}
                 </div>
             </div>`;
